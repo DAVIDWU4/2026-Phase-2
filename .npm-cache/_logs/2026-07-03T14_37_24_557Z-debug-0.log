@@ -1,0 +1,481 @@
+0 verbose cli C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\e8597d88-f25e-4019-9b3a-a457e81ff76d\node\node.exe C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\e8597d88-f25e-4019-9b3a-a457e81ff76d\node\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.8.2
+2 info using node@v20.20.2
+3 silly config load:file:C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\e8597d88-f25e-4019-9b3a-a457e81ff76d\node\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\david\2026-Phase-2\frontend\.npmrc
+5 silly config load:file:C:\Users\david\.npmrc
+6 silly config load:file:C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\e8597d88-f25e-4019-9b3a-a457e81ff76d\node\etc\npmrc
+7 verbose title npm install
+8 verbose argv "install" "--cache" "C:\\Users\\david\\2026-Phase-2\\.npm-cache" "--no-audit" "--no-fund"
+9 verbose logfile logs-max:10 dir:C:\Users\david\2026-Phase-2\.npm-cache\_logs\2026-07-03T14_37_24_557Z-
+10 verbose logfile C:\Users\david\2026-Phase-2\.npm-cache\_logs\2026-07-03T14_37_24_557Z-debug-0.log
+11 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+12 silly logfile done cleaning log files
+13 silly idealTree buildDeps
+14 silly fetch manifest @emnapi/core@^1.7.1
+15 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fcore cache-miss
+16 http fetch GET 200 https://registry.npmjs.org/@emnapi%2fcore 268ms (cache miss)
+17 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fcore set size:undefined disposed:false
+18 silly fetch manifest @emnapi/runtime@^1.7.1
+19 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fruntime cache-miss
+20 http fetch GET 200 https://registry.npmjs.org/@emnapi%2fruntime 181ms (cache miss)
+21 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fruntime set size:undefined disposed:false
+22 silly placeDep ROOT @emnapi/core@1.11.2 OK for: @napi-rs/wasm-runtime@1.1.5 want: ^1.7.1
+23 silly placeDep ROOT @emnapi/runtime@1.11.2 OK for: @napi-rs/wasm-runtime@1.1.5 want: ^1.7.1
+24 silly fetch manifest @emnapi/wasi-threads@1.2.2
+25 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fwasi-threads cache-miss
+26 http fetch GET 200 https://registry.npmjs.org/npm 635ms
+27 http fetch GET 200 https://registry.npmjs.org/@emnapi%2fwasi-threads 112ms (cache miss)
+28 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fwasi-threads set size:undefined disposed:false
+29 silly placeDep ROOT @emnapi/wasi-threads@1.2.2 REPLACE for: @emnapi/core@1.11.2 want: 1.2.2
+30 silly fetch manifest @emnapi/core@1.10.0
+31 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fcore cache-miss
+32 http fetch GET 200 https://registry.npmjs.org/@emnapi%2fcore 146ms (cache hit)
+33 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fcore set size:117071 disposed:false
+34 silly fetch manifest @emnapi/runtime@1.10.0
+35 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fruntime cache-miss
+36 http fetch GET 200 https://registry.npmjs.org/@emnapi%2fruntime 87ms (cache hit)
+37 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fruntime set size:118526 disposed:false
+38 silly placeDep node_modules/@rolldown/binding-wasm32-wasi @emnapi/core@1.10.0 OK for: @rolldown/binding-wasm32-wasi@1.0.3 want: 1.10.0
+39 silly placeDep node_modules/@rolldown/binding-wasm32-wasi @emnapi/runtime@1.10.0 OK for: @rolldown/binding-wasm32-wasi@1.0.3 want: 1.10.0
+40 silly fetch manifest @emnapi/wasi-threads@1.2.1
+41 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fwasi-threads cache-miss
+42 http fetch GET 200 https://registry.npmjs.org/@emnapi%2fwasi-threads 83ms (cache hit)
+43 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fwasi-threads set size:28580 disposed:false
+44 silly placeDep node_modules/@rolldown/binding-wasm32-wasi @emnapi/wasi-threads@1.2.1 OK for: @emnapi/core@1.10.0 want: 1.2.1
+45 silly reify mark retired [ 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\acorn' ]
+46 silly reify mark retired [
+46 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\caniuse-lite'
+46 silly reify ]
+47 silly reify mark retired [ 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\eslint' ]
+48 silly reify mark retired [ 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\picomatch' ]
+49 silly reify mark retired [ 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\react-dom' ]
+50 silly reify mark retired [ 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\uri-js' ]
+51 silly reify mark retired [
+51 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\typescript'
+51 silly reify ]
+52 silly reify mark retired [ 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\zod' ]
+53 silly reify mark retired [ 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\vite' ]
+54 silly reify mark retired [
+54 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\core'
+54 silly reify ]
+55 silly reify mark retired [
+55 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\generator'
+55 silly reify ]
+56 silly reify mark retired [
+56 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\helpers'
+56 silly reify ]
+57 silly reify mark retired [
+57 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\types'
+57 silly reify ]
+58 silly reify mark retired [
+58 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\traverse'
+58 silly reify ]
+59 silly reify mark retired [
+59 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-android-arm64'
+59 silly reify ]
+60 silly reify mark retired [
+60 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@typescript-eslint\\eslint-plugin'
+60 silly reify ]
+61 silly reify mark retired [
+61 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@typescript-eslint\\scope-manager'
+61 silly reify ]
+62 silly reify mark retired [
+62 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\baseline-browser-mapping',
+62 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\baseline-browser-mapping',
+62 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\baseline-browser-mapping.cmd',
+62 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\baseline-browser-mapping.ps1'
+62 silly reify ]
+63 silly reify mark retired [
+63 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\browserslist',
+63 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\browserslist',
+63 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\browserslist.cmd',
+63 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\browserslist.ps1'
+63 silly reify ]
+64 silly reify mark retired [
+64 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\jsesc',
+64 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\jsesc',
+64 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\jsesc.cmd',
+64 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\jsesc.ps1'
+64 silly reify ]
+65 silly reify mark retired [
+65 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\json5',
+65 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\json5',
+65 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\json5.cmd',
+65 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\json5.ps1'
+65 silly reify ]
+66 silly reify mark retired [
+66 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\nanoid',
+66 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\nanoid',
+66 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\nanoid.cmd',
+66 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\nanoid.ps1'
+66 silly reify ]
+67 silly reify mark retired [
+67 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\rolldown',
+67 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\rolldown',
+67 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\rolldown.cmd',
+67 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\rolldown.ps1'
+67 silly reify ]
+68 silly reify mark retired [
+68 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\semver',
+68 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\semver',
+68 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\semver.cmd',
+68 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\semver.ps1'
+68 silly reify ]
+69 silly reify mark retired [
+69 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\which',
+69 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\node-which',
+69 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\node-which.cmd',
+69 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\node-which.ps1'
+69 silly reify ]
+70 silly reify mark retired [
+70 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\update-browserslist-db',
+70 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\update-browserslist-db',
+70 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\update-browserslist-db.cmd',
+70 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\update-browserslist-db.ps1'
+70 silly reify ]
+71 silly reify mark retired [
+71 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\parser',
+71 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\parser',
+71 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\parser.cmd',
+71 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\parser.ps1'
+71 silly reify ]
+72 silly reify mark retired [
+72 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@typescript-eslint\\typescript-estree\\node_modules\\semver'
+72 silly reify ]
+73 silly reify moves {
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\acorn': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.acorn-lYWlzlIo',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\caniuse-lite': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.caniuse-lite-TRDnRNQf',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\eslint': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.eslint-okx9kkIB',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\picomatch': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.picomatch-jzR6MNQP',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\react-dom': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.react-dom-3UECrCEq',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\uri-js': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.uri-js-fWJrqD9b',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\typescript': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.typescript-RQy3bPYM',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\zod': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.zod-pAxkANog',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\vite': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.vite-UQfGoisG',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\core': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\.core-VVoyRBrJ',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\generator': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\.generator-ZbeCRc91',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\helpers': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\.helpers-eHwgBvYe',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\types': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\.types-fs4D9ijc',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\traverse': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\.traverse-6VqGQfXe',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-android-arm64': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\.binding-android-arm64-4wyndSxt',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@typescript-eslint\\eslint-plugin': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@typescript-eslint\\.eslint-plugin-EDIh9gkH',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@typescript-eslint\\scope-manager': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@typescript-eslint\\.scope-manager-D0gwqut6',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\baseline-browser-mapping': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.baseline-browser-mapping-7U5penUB',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\baseline-browser-mapping': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.baseline-browser-mapping-m1AOtu9O',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\baseline-browser-mapping.cmd': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.baseline-browser-mapping.cmd-IrMypmif',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\baseline-browser-mapping.ps1': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.baseline-browser-mapping.ps1-6VP0Ac0a',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\browserslist': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.browserslist-2CwWLCNz',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\browserslist': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.browserslist-cPNdku1h',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\browserslist.cmd': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.browserslist.cmd-Od7tDF5E',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\browserslist.ps1': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.browserslist.ps1-m39iR1fF',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\jsesc': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.jsesc-u5VfQTTT',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\jsesc': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.jsesc-UUe2yBJQ',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\jsesc.cmd': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.jsesc.cmd-1xqpNEXW',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\jsesc.ps1': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.jsesc.ps1-MzU5S12k',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\json5': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.json5-krAYAcsd',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\json5': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.json5-3b6eBV6N',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\json5.cmd': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.json5.cmd-GJBqUmsM',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\json5.ps1': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.json5.ps1-xpgqFDuv',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\nanoid': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.nanoid-GNstvGP3',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\nanoid': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.nanoid-8InNF06F',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\nanoid.cmd': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.nanoid.cmd-SZK4ARNn',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\nanoid.ps1': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.nanoid.ps1-59oxfgh9',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\rolldown': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.rolldown-J5hFq4Jv',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\rolldown': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.rolldown-ih45uYp0',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\rolldown.cmd': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.rolldown.cmd-5FNHvXe0',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\rolldown.ps1': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.rolldown.ps1-F6PqYYMO',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\semver': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.semver-obeZmw9d',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\semver': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.semver-Tjf6NNED',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.semver.cmd-qlWMVUpw',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.semver.ps1-HbtIcyso',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\which': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.which-Do3Yp03w',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\node-which': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.node-which-LJDIj1pm',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\node-which.cmd': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.node-which.cmd-4TrNQNX4',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\node-which.ps1': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.node-which.ps1-nMFdyJds',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\update-browserslist-db': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.update-browserslist-db-Iu6e5As1',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\update-browserslist-db': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.update-browserslist-db-nySY9brW',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\update-browserslist-db.cmd': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.update-browserslist-db.cmd-vmbzLvg1',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\update-browserslist-db.ps1': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.update-browserslist-db.ps1-6iffPULb',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\parser': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@babel\\.parser-aPWhMB4J',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\parser': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.parser-gVYNk6wa',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\parser.cmd': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.parser.cmd-i03lEZKV',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\parser.ps1': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\.bin\\.parser.ps1-n9R9XSWx',
+73 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@typescript-eslint\\typescript-estree\\node_modules\\semver': 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@typescript-eslint\\typescript-estree\\node_modules\\.semver-8g5pgjJl'
+73 silly reify }
+74 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\lightningcss-win32-arm64-msvc
+75 silly reify mark deleted [
+75 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\lightningcss-win32-arm64-msvc'
+75 silly reify ]
+76 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\lightningcss-linux-x64-musl
+77 silly reify mark deleted [
+77 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\lightningcss-linux-x64-musl'
+77 silly reify ]
+78 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\lightningcss-linux-x64-gnu
+79 silly reify mark deleted [
+79 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\lightningcss-linux-x64-gnu'
+79 silly reify ]
+80 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\lightningcss-linux-arm64-musl
+81 silly reify mark deleted [
+81 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\lightningcss-linux-arm64-musl'
+81 silly reify ]
+82 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\lightningcss-linux-arm64-gnu
+83 silly reify mark deleted [
+83 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\lightningcss-linux-arm64-gnu'
+83 silly reify ]
+84 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\lightningcss-linux-arm-gnueabihf
+85 silly reify mark deleted [
+85 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\lightningcss-linux-arm-gnueabihf'
+85 silly reify ]
+86 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\lightningcss-freebsd-x64
+87 silly reify mark deleted [
+87 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\lightningcss-freebsd-x64'
+87 silly reify ]
+88 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\lightningcss-darwin-x64
+89 silly reify mark deleted [
+89 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\lightningcss-darwin-x64'
+89 silly reify ]
+90 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\lightningcss-darwin-arm64
+91 silly reify mark deleted [
+91 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\lightningcss-darwin-arm64'
+91 silly reify ]
+92 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\lightningcss-android-arm64
+93 silly reify mark deleted [
+93 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\lightningcss-android-arm64'
+93 silly reify ]
+94 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\fsevents
+95 silly reify mark deleted [ 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\fsevents' ]
+96 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-win32-arm64-msvc
+97 silly reify mark deleted [
+97 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-win32-arm64-msvc'
+97 silly reify ]
+98 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-wasm32-wasi
+99 silly reify mark deleted [
+99 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-wasm32-wasi'
+99 silly reify ]
+100 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-wasm32-wasi\node_modules\@emnapi\core
+101 silly reify mark deleted [
+101 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-wasm32-wasi\\node_modules\\@emnapi\\core'
+101 silly reify ]
+102 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-wasm32-wasi\node_modules\@emnapi\runtime
+103 silly reify mark deleted [
+103 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-wasm32-wasi\\node_modules\\@emnapi\\runtime'
+103 silly reify ]
+104 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@napi-rs\wasm-runtime
+105 silly reify mark deleted [
+105 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@napi-rs\\wasm-runtime'
+105 silly reify ]
+106 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\tslib
+107 silly reify mark deleted [ 'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\tslib' ]
+108 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-wasm32-wasi\node_modules\@emnapi\wasi-threads
+109 silly reify mark deleted [
+109 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-wasm32-wasi\\node_modules\\@emnapi\\wasi-threads'
+109 silly reify ]
+110 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@emnapi\core
+111 silly reify mark deleted [
+111 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@emnapi\\core'
+111 silly reify ]
+112 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@emnapi\runtime
+113 silly reify mark deleted [
+113 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@emnapi\\runtime'
+113 silly reify ]
+114 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@tybys\wasm-util
+115 silly reify mark deleted [
+115 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@tybys\\wasm-util'
+115 silly reify ]
+116 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@emnapi\wasi-threads
+117 silly reify mark deleted [
+117 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@emnapi\\wasi-threads'
+117 silly reify ]
+118 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-openharmony-arm64
+119 silly reify mark deleted [
+119 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-openharmony-arm64'
+119 silly reify ]
+120 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-linux-x64-musl
+121 silly reify mark deleted [
+121 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-linux-x64-musl'
+121 silly reify ]
+122 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-linux-x64-gnu
+123 silly reify mark deleted [
+123 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-linux-x64-gnu'
+123 silly reify ]
+124 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-linux-s390x-gnu
+125 silly reify mark deleted [
+125 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-linux-s390x-gnu'
+125 silly reify ]
+126 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-linux-ppc64-gnu
+127 silly reify mark deleted [
+127 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-linux-ppc64-gnu'
+127 silly reify ]
+128 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-linux-arm64-musl
+129 silly reify mark deleted [
+129 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-linux-arm64-musl'
+129 silly reify ]
+130 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-linux-arm64-gnu
+131 silly reify mark deleted [
+131 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-linux-arm64-gnu'
+131 silly reify ]
+132 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-linux-arm-gnueabihf
+133 silly reify mark deleted [
+133 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-linux-arm-gnueabihf'
+133 silly reify ]
+134 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-freebsd-x64
+135 silly reify mark deleted [
+135 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-freebsd-x64'
+135 silly reify ]
+136 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-darwin-x64
+137 silly reify mark deleted [
+137 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-darwin-x64'
+137 silly reify ]
+138 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-darwin-arm64
+139 silly reify mark deleted [
+139 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-darwin-arm64'
+139 silly reify ]
+140 verbose reify failed optional dependency C:\Users\david\2026-Phase-2\frontend\node_modules\@rolldown\binding-android-arm64
+141 silly reify mark deleted [
+141 silly reify   'C:\\Users\\david\\2026-Phase-2\\frontend\\node_modules\\@rolldown\\binding-android-arm64'
+141 silly reify ]
+142 silly tarball no local data for @emnapi/wasi-threads@https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.2.tgz. Extracting by manifest.
+143 silly tarball no local data for @tybys/wasm-util@https://registry.npmjs.org/@tybys/wasm-util/-/wasm-util-0.10.2.tgz. Extracting by manifest.
+144 silly tarball no local data for @emnapi/runtime@https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.2.tgz. Extracting by manifest.
+145 silly tarball no local data for @napi-rs/wasm-runtime@https://registry.npmjs.org/@napi-rs/wasm-runtime/-/wasm-runtime-1.1.5.tgz. Extracting by manifest.
+146 silly tarball no local data for @emnapi/core@https://registry.npmjs.org/@emnapi/core/-/core-1.11.2.tgz. Extracting by manifest.
+147 silly tarball no local data for nanoid@https://registry.npmjs.org/nanoid/-/nanoid-3.3.12.tgz. Extracting by manifest.
+148 silly tarball no local data for tslib@https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz. Extracting by manifest.
+149 silly tarball no local data for semver@https://registry.npmjs.org/semver/-/semver-6.3.1.tgz. Extracting by manifest.
+150 silly tarball no local data for update-browserslist-db@https://registry.npmjs.org/update-browserslist-db/-/update-browserslist-db-1.2.3.tgz. Extracting by manifest.
+151 silly tarball no local data for @babel/parser@https://registry.npmjs.org/@babel/parser/-/parser-7.29.7.tgz. Extracting by manifest.
+152 silly tarball no local data for jsesc@https://registry.npmjs.org/jsesc/-/jsesc-3.1.0.tgz. Extracting by manifest.
+153 silly tarball no local data for browserslist@https://registry.npmjs.org/browserslist/-/browserslist-4.28.2.tgz. Extracting by manifest.
+154 silly tarball no local data for which@https://registry.npmjs.org/which/-/which-2.0.2.tgz. Extracting by manifest.
+155 silly tarball no local data for typescript@https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz. Extracting by manifest.
+156 silly tarball no local data for react-dom@https://registry.npmjs.org/react-dom/-/react-dom-19.2.7.tgz. Extracting by manifest.
+157 silly tarball no local data for caniuse-lite@https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001799.tgz. Extracting by manifest.
+158 silly tarball no local data for @emnapi/runtime@https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.10.0.tgz. Extracting by manifest.
+159 silly tarball no local data for semver@https://registry.npmjs.org/semver/-/semver-7.8.4.tgz. Extracting by manifest.
+160 silly tarball no local data for @emnapi/wasi-threads@https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz. Extracting by manifest.
+161 silly tarball no local data for @emnapi/core@https://registry.npmjs.org/@emnapi/core/-/core-1.10.0.tgz. Extracting by manifest.
+162 silly tarball no local data for rolldown@https://registry.npmjs.org/rolldown/-/rolldown-1.0.3.tgz. Extracting by manifest.
+163 silly tarball no local data for @typescript-eslint/scope-manager@https://registry.npmjs.org/@typescript-eslint/scope-manager/-/scope-manager-8.61.1.tgz. Extracting by manifest.
+164 silly tarball no local data for @babel/traverse@https://registry.npmjs.org/@babel/traverse/-/traverse-7.29.7.tgz. Extracting by manifest.
+165 silly tarball no local data for @typescript-eslint/eslint-plugin@https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.61.1.tgz. Extracting by manifest.
+166 silly tarball no local data for @babel/types@https://registry.npmjs.org/@babel/types/-/types-7.29.7.tgz. Extracting by manifest.
+167 silly tarball no local data for @babel/core@https://registry.npmjs.org/@babel/core/-/core-7.29.7.tgz. Extracting by manifest.
+168 silly tarball no local data for json5@https://registry.npmjs.org/json5/-/json5-2.2.3.tgz. Extracting by manifest.
+169 silly tarball no local data for @babel/helpers@https://registry.npmjs.org/@babel/helpers/-/helpers-7.29.7.tgz. Extracting by manifest.
+170 silly tarball no local data for vite@https://registry.npmjs.org/vite/-/vite-8.0.16.tgz. Extracting by manifest.
+171 silly tarball no local data for uri-js@https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz. Extracting by manifest.
+172 silly tarball no local data for baseline-browser-mapping@https://registry.npmjs.org/baseline-browser-mapping/-/baseline-browser-mapping-2.10.37.tgz. Extracting by manifest.
+173 silly tarball no local data for @babel/generator@https://registry.npmjs.org/@babel/generator/-/generator-7.29.7.tgz. Extracting by manifest.
+174 silly tarball no local data for eslint@https://registry.npmjs.org/eslint/-/eslint-10.5.0.tgz. Extracting by manifest.
+175 silly tarball no local data for zod@https://registry.npmjs.org/zod/-/zod-4.4.3.tgz. Extracting by manifest.
+176 silly tarball no local data for acorn@https://registry.npmjs.org/acorn/-/acorn-8.17.0.tgz. Extracting by manifest.
+177 silly tarball no local data for picomatch@https://registry.npmjs.org/picomatch/-/picomatch-4.0.4.tgz. Extracting by manifest.
+178 http fetch GET 200 https://registry.npmjs.org/which/-/which-2.0.2.tgz 831ms (cache miss)
+179 http fetch GET 200 https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.2.tgz 909ms (cache miss)
+180 http fetch GET 200 https://registry.npmjs.org/update-browserslist-db/-/update-browserslist-db-1.2.3.tgz 942ms (cache miss)
+181 http fetch GET 200 https://registry.npmjs.org/jsesc/-/jsesc-3.1.0.tgz 999ms (cache miss)
+182 http fetch GET 200 https://registry.npmjs.org/semver/-/semver-6.3.1.tgz 1079ms (cache miss)
+183 http fetch GET 200 https://registry.npmjs.org/browserslist/-/browserslist-4.28.2.tgz 1086ms (cache miss)
+184 http fetch GET 200 https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz 1230ms (cache miss)
+185 http fetch GET 200 https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.2.tgz 1248ms (cache miss)
+186 http fetch GET 200 https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.10.0.tgz 1074ms (cache miss)
+187 http fetch GET 200 https://registry.npmjs.org/nanoid/-/nanoid-3.3.12.tgz 1420ms (cache miss)
+188 http fetch GET 200 https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz 1172ms (cache miss)
+189 http fetch GET 200 https://registry.npmjs.org/baseline-browser-mapping/-/baseline-browser-mapping-2.10.37.tgz 1085ms (cache miss)
+190 http fetch GET 200 https://registry.npmjs.org/json5/-/json5-2.2.3.tgz 1102ms (cache miss)
+191 http fetch GET 200 https://registry.npmjs.org/picomatch/-/picomatch-4.0.4.tgz 1278ms (cache miss)
+192 http fetch GET 200 https://registry.npmjs.org/acorn/-/acorn-8.17.0.tgz 1436ms (cache miss)
+193 http fetch GET 200 https://registry.npmjs.org/@emnapi/core/-/core-1.11.2.tgz 1987ms (cache miss)
+194 http fetch GET 200 https://registry.npmjs.org/@tybys/wasm-util/-/wasm-util-0.10.2.tgz 2041ms (cache miss)
+195 http fetch GET 200 https://registry.npmjs.org/@babel/parser/-/parser-7.29.7.tgz 2126ms (cache miss)
+196 http fetch GET 200 https://registry.npmjs.org/@emnapi/core/-/core-1.10.0.tgz 1849ms (cache miss)
+197 http fetch GET 200 https://registry.npmjs.org/semver/-/semver-7.8.4.tgz 1931ms (cache miss)
+198 http fetch GET 200 https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz 1989ms (cache miss)
+199 http fetch GET 200 https://registry.npmjs.org/@babel/generator/-/generator-7.29.7.tgz 1986ms (cache miss)
+200 http fetch GET 200 https://registry.npmjs.org/rolldown/-/rolldown-1.0.3.tgz 2050ms (cache miss)
+201 http fetch GET 200 https://registry.npmjs.org/vite/-/vite-8.0.16.tgz 2270ms (cache miss)
+202 http fetch GET 200 https://registry.npmjs.org/@babel/traverse/-/traverse-7.29.7.tgz 2305ms (cache miss)
+203 http fetch GET 200 https://registry.npmjs.org/@napi-rs/wasm-runtime/-/wasm-runtime-1.1.5.tgz 2867ms (cache miss)
+204 http fetch GET 200 https://registry.npmjs.org/react-dom/-/react-dom-19.2.7.tgz 3308ms (cache miss)
+205 http fetch GET 200 https://registry.npmjs.org/@babel/core/-/core-7.29.7.tgz 3149ms (cache miss)
+206 http fetch GET 200 https://registry.npmjs.org/@babel/types/-/types-7.29.7.tgz 3600ms (cache miss)
+207 http fetch GET 200 https://registry.npmjs.org/@babel/helpers/-/helpers-7.29.7.tgz 3988ms (cache miss)
+208 http fetch GET 200 https://registry.npmjs.org/@typescript-eslint/scope-manager/-/scope-manager-8.61.1.tgz 4648ms (cache miss)
+209 http fetch GET 200 https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz 5369ms (cache miss)
+210 http fetch GET 200 https://registry.npmjs.org/eslint/-/eslint-10.5.0.tgz 5327ms (cache miss)
+211 http fetch GET 200 https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.61.1.tgz 5433ms (cache miss)
+212 http fetch GET 200 https://registry.npmjs.org/zod/-/zod-4.4.3.tgz 6788ms (cache miss)
+213 http fetch GET 200 https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001799.tgz 7261ms (cache miss)
+214 silly ADD
+215 silly ADD
+216 silly ADD
+217 silly ADD
+218 silly ADD
+219 silly ADD
+220 silly ADD
+221 silly ADD
+222 silly ADD
+223 silly ADD
+224 silly ADD
+225 silly ADD
+226 silly ADD
+227 silly ADD
+228 silly ADD
+229 silly ADD
+230 silly ADD
+231 silly ADD
+232 silly ADD node_modules/@emnapi/wasi-threads
+233 silly ADD node_modules/@emnapi/runtime
+234 silly ADD node_modules/@emnapi/core
+235 silly ADD
+236 silly ADD
+237 silly ADD
+238 silly ADD
+239 silly ADD
+240 silly ADD
+241 silly ADD
+242 silly ADD
+243 silly ADD
+244 silly ADD
+245 silly ADD
+246 silly ADD
+247 silly CHANGE node_modules/@typescript-eslint/typescript-estree/node_modules/semver
+248 silly CHANGE node_modules/@babel/parser
+249 silly CHANGE node_modules/update-browserslist-db
+250 silly CHANGE node_modules/which
+251 silly CHANGE node_modules/semver
+252 silly CHANGE node_modules/rolldown
+253 silly CHANGE node_modules/nanoid
+254 silly CHANGE node_modules/json5
+255 silly CHANGE node_modules/jsesc
+256 silly CHANGE node_modules/browserslist
+257 silly CHANGE node_modules/baseline-browser-mapping
+258 silly CHANGE node_modules/@typescript-eslint/scope-manager
+259 silly CHANGE node_modules/@typescript-eslint/eslint-plugin
+260 silly CHANGE node_modules/@rolldown/binding-android-arm64
+261 silly CHANGE node_modules/@babel/traverse
+262 silly CHANGE node_modules/@babel/types
+263 silly CHANGE node_modules/@babel/helpers
+264 silly CHANGE node_modules/@babel/generator
+265 silly CHANGE node_modules/@babel/core
+266 silly CHANGE node_modules/vite
+267 silly CHANGE node_modules/zod
+268 silly CHANGE node_modules/typescript
+269 silly CHANGE node_modules/uri-js
+270 silly CHANGE node_modules/react-dom
+271 silly CHANGE node_modules/picomatch
+272 silly CHANGE node_modules/eslint
+273 silly CHANGE node_modules/caniuse-lite
+274 silly CHANGE node_modules/acorn
+275 verbose cwd C:\Users\david\2026-Phase-2\frontend
+276 verbose os Windows_NT 10.0.26200
+277 verbose node v20.20.2
+278 verbose npm  v10.8.2
+279 notice
+279 notice New major version of npm available! 10.8.2 -> 11.18.0
+279 notice Changelog: https://github.com/npm/cli/releases/tag/v11.18.0
+279 notice To update run: npm install -g npm@11.18.0
+279 notice  { force: true, [Symbol(proc-log.meta)]: true }
+280 verbose exit 0
+281 info ok

@@ -1,0 +1,116 @@
+0 verbose cli C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\e8597d88-f25e-4019-9b3a-a457e81ff76d\node\node.exe C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\e8597d88-f25e-4019-9b3a-a457e81ff76d\node\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.8.2
+2 info using node@v20.20.2
+3 silly config load:file:C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\e8597d88-f25e-4019-9b3a-a457e81ff76d\node\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\david\2026-Phase-2\frontend\.npmrc
+5 silly config load:file:C:\Users\david\.npmrc
+6 silly config load:file:C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\e8597d88-f25e-4019-9b3a-a457e81ff76d\node\etc\npmrc
+7 verbose title npm install vite@7.0.0 @vitejs/plugin-react@4.0.0
+8 verbose argv "install" "vite@7.0.0" "@vitejs/plugin-react@4.0.0" "--save-dev" "--cache" "C:\\Users\\david\\2026-Phase-2\\.npm-cache" "--no-audit" "--no-fund"
+9 verbose logfile logs-max:10 dir:C:\Users\david\2026-Phase-2\.npm-cache\_logs\2026-07-03T15_12_29_750Z-
+10 verbose logfile C:\Users\david\2026-Phase-2\.npm-cache\_logs\2026-07-03T15_12_29_750Z-debug-0.log
+11 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+12 silly logfile done cleaning log files
+13 silly idealTree buildDeps
+14 silly fetch manifest @vitejs/plugin-react@4.0.0
+15 silly packumentCache full:https://registry.npmjs.org/@vitejs%2fplugin-react cache-miss
+16 verbose shrinkwrap failed to load node_modules/.package-lock.json missing from lockfile: node_modules/tslib
+17 http fetch GET 200 https://registry.npmjs.org/@vitejs%2fplugin-react 772ms (cache miss)
+18 silly packumentCache full:https://registry.npmjs.org/@vitejs%2fplugin-react set size:undefined disposed:false
+19 silly fetch manifest vite@7.0.0
+20 silly packumentCache full:https://registry.npmjs.org/vite cache-miss
+21 http fetch GET 200 https://registry.npmjs.org/vite 1319ms (cache miss)
+22 silly packumentCache full:https://registry.npmjs.org/vite set size:undefined disposed:false
+23 silly fetch manifest vite@^4.2.0
+24 silly packumentCache full:https://registry.npmjs.org/vite cache-miss
+25 http fetch GET 200 https://registry.npmjs.org/vite 238ms (cache hit)
+26 silly packumentCache full:https://registry.npmjs.org/vite set size:38896984 disposed:false
+27 silly fetch manifest @types/node@^24.12.3
+28 silly packumentCache full:https://registry.npmjs.org/@types%2fnode cache-miss
+29 http fetch GET 200 https://registry.npmjs.org/@types%2fnode 223ms (cache miss)
+30 silly packumentCache full:https://registry.npmjs.org/@types%2fnode set size:undefined disposed:false
+31 silly fetch manifest jiti@>=1.21.0
+32 silly packumentCache full:https://registry.npmjs.org/jiti cache-miss
+33 http fetch GET 200 https://registry.npmjs.org/jiti 224ms (cache miss)
+34 silly packumentCache full:https://registry.npmjs.org/jiti set size:undefined disposed:false
+35 silly fetch manifest less@^4.0.0
+36 silly packumentCache full:https://registry.npmjs.org/less cache-miss
+37 http fetch GET 200 https://registry.npmjs.org/less 220ms (cache miss)
+38 silly packumentCache full:https://registry.npmjs.org/less set size:undefined disposed:false
+39 silly fetch manifest lightningcss@^1.21.0
+40 silly packumentCache full:https://registry.npmjs.org/lightningcss cache-miss
+41 http fetch GET 200 https://registry.npmjs.org/lightningcss 46ms (cache miss)
+42 silly packumentCache full:https://registry.npmjs.org/lightningcss set size:undefined disposed:false
+43 silly fetch manifest sass@^1.70.0
+44 silly packumentCache full:https://registry.npmjs.org/sass cache-miss
+45 http fetch GET 200 https://registry.npmjs.org/sass 63ms (cache miss)
+46 silly packumentCache full:https://registry.npmjs.org/sass set size:undefined disposed:false
+47 silly fetch manifest sass-embedded@^1.70.0
+48 silly packumentCache full:https://registry.npmjs.org/sass-embedded cache-miss
+49 http fetch GET 200 https://registry.npmjs.org/sass-embedded 209ms (cache miss)
+50 silly packumentCache full:https://registry.npmjs.org/sass-embedded set size:undefined disposed:false
+51 silly fetch manifest stylus@>=0.54.8
+52 silly packumentCache full:https://registry.npmjs.org/stylus cache-miss
+53 http fetch GET 200 https://registry.npmjs.org/stylus 234ms (cache miss)
+54 silly packumentCache full:https://registry.npmjs.org/stylus set size:undefined disposed:false
+55 silly fetch manifest sugarss@^5.0.0
+56 silly packumentCache full:https://registry.npmjs.org/sugarss cache-miss
+57 http fetch GET 200 https://registry.npmjs.org/sugarss 198ms (cache miss)
+58 silly packumentCache full:https://registry.npmjs.org/sugarss set size:undefined disposed:false
+59 silly fetch manifest postcss@^8.3.3
+60 silly packumentCache full:https://registry.npmjs.org/postcss cache-miss
+61 http fetch GET 200 https://registry.npmjs.org/postcss 57ms (cache miss)
+62 silly packumentCache full:https://registry.npmjs.org/postcss set size:undefined disposed:false
+63 silly fetch manifest terser@^5.16.0
+64 silly packumentCache full:https://registry.npmjs.org/terser cache-miss
+65 http fetch GET 200 https://registry.npmjs.org/terser 215ms (cache miss)
+66 silly packumentCache full:https://registry.npmjs.org/terser set size:undefined disposed:false
+67 silly fetch manifest tsx@^4.8.1
+68 silly packumentCache full:https://registry.npmjs.org/tsx cache-miss
+69 http fetch GET 200 https://registry.npmjs.org/tsx 48ms (cache miss)
+70 silly packumentCache full:https://registry.npmjs.org/tsx set size:undefined disposed:false
+71 silly fetch manifest yaml@^2.4.2
+72 silly packumentCache full:https://registry.npmjs.org/yaml cache-miss
+73 http fetch GET 200 https://registry.npmjs.org/yaml 48ms (cache miss)
+74 silly packumentCache full:https://registry.npmjs.org/yaml set size:undefined disposed:false
+75 verbose stack Error: unable to resolve dependency tree
+75 verbose stack     at #failPeerConflict (C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\***\node\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:1360:25)
+75 verbose stack     at #loadPeerSet (C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\***\node\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:1326:33)
+75 verbose stack     at async #buildDepStep (C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\***\node\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:901:11)
+75 verbose stack     at async Arborist.buildIdealTree (C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\***\node\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:181:7)
+75 verbose stack     at async Promise.all (index 1)
+75 verbose stack     at async Arborist.reify (C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\***\node\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:131:5)
+75 verbose stack     at async Install.exec (C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\***\node\node_modules\npm\lib\commands\install.js:150:5)
+75 verbose stack     at async Npm.exec (C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\***\node\node_modules\npm\lib\npm.js:207:9)
+75 verbose stack     at async module.exports (C:\Users\david\AppData\Local\Doubao\User Data\Default\sandbox_envs_dir\envs\***\node\node_modules\npm\lib\cli\entry.js:74:5)
+76 error code ERESOLVE
+77 error ERESOLVE unable to resolve dependency tree
+78 error
+79 error While resolving: frontend@0.0.0
+79 error Found: vite@7.0.0
+79 error node_modules/vite
+79 error   dev vite@"7.0.0" from the root project
+79 error
+79 error Could not resolve dependency:
+79 error peer vite@"^4.2.0" from @vitejs/plugin-react@4.0.0
+79 error node_modules/@vitejs/plugin-react
+79 error   dev @vitejs/plugin-react@"4.0.0" from the root project
+79 error
+79 error Fix the upstream dependency conflict, or retry
+79 error this command with --force or --legacy-peer-deps
+79 error to accept an incorrect (and potentially broken) dependency resolution.
+80 error
+80 error
+80 error For a full report see:
+80 error C:\Users\david\2026-Phase-2\.npm-cache\_logs\2026-07-03T15_12_29_750Z-eresolve-report.txt
+81 silly unfinished npm timer reify 1783091551477
+82 silly unfinished npm timer reify:loadTrees 1783091551485
+83 silly unfinished npm timer idealTree:buildDeps 1783091551548
+84 silly unfinished npm timer idealTree:#root 1783091551549
+85 verbose cwd C:\Users\david\2026-Phase-2\frontend
+86 verbose os Windows_NT 10.0.26200
+87 verbose node v20.20.2
+88 verbose npm  v10.8.2
+89 verbose exit 1
+90 verbose code 1
+91 error A complete log of this run can be found in: C:\Users\david\2026-Phase-2\.npm-cache\_logs\2026-07-03T15_12_29_750Z-debug-0.log
