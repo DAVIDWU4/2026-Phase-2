@@ -1,4 +1,4 @@
-import type { ScoreEntry } from './types'
+import type { ScoreEntry, User, StudyRecord, Badge, LoginRequest } from './types'
 
 const BASE = 'http://localhost:5000/api/scores'
 
