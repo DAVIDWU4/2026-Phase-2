@@ -3,6 +3,8 @@ using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+namespace backend.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
 public class StudyRecordsController : ControllerBase
@@ -14,71 +16,115 @@ public class StudyRecordsController : ControllerBase
         _context = context;
     }
 
-    // GET: api/StudyRecords/user/5
-    [HttpGet("user/{userId}")]
-    public async Task<ActionResult<IEnumerable<StudyRecord>>> GetUserStudyRecords(int userId)
+    // get all study records
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<StudyRecord>>> GetStudyRecords()
     {
-        return await _context.StudyRecords
-            .Where(r => r.rID == userId)
-            .OrderByDescending(r => r.Date)
-            .ToListAsync();
+        return await _context.StudyRecords.Include(sr => sr.User).ToListAsync();
     }
 
-    // POST: api/StudyRecords
+    // get a single study record by id
+    [HttpGet("{id}")]
+    public async Task<ActionResult<StudyRecord>> GetStudyRecord(int id)
+    {
+        var studyRecord = await _context.StudyRecords
+            .Include(sr => sr.User)
+            .FirstOrDefaultAsync(sr => sr.Id == id);
+        if (studyRecord == null) return NotFound();
+        return studyRecord;
+    }
+
+    // create a new study record
+    // (automatically adds score, updates streak, and unlocks badges)
     [HttpPost]
-    public async Task<ActionResult<StudyRecord>> CreateStudyRecord(StudyRecord record)
+    public async Task<ActionResult<StudyRecord>> PostStudyRecord(StudyRecord studyRecord)
     {
-        // Calculate points (1 point per minute, max 100 per day)
-        int dailyPoints = await _context.StudyRecords
-            .Where(r => r.rID == record.rID && r.Date.Date == record.Date.Date)
-            .SumAsync(r => r.EarnedPoints);
-        
-        int pointsToAdd = Math.Min(record.Duration, 100 - dailyPoints);
-        
-        // Calculate streak
-        var yesterday = record.Date.Date.AddDays(-1);
-        bool hasYesterdayRecord = await _context.StudyRecords
-            .AnyAsync(r => r.rID == record.rID && r.Date.Date == yesterday);
-        
-        int streakCount = hasYesterdayRecord 
-            ? await _context.StudyRecords
-                .Where(r => r.rID == record.rID)
-                .OrderByDescending(r => r.Date)
-                .Select(r => r.StreakCount)
-                .FirstOrDefaultAsync() + 1
-            : 1;
+        var user = await _context.Users.FindAsync(studyRecord.UserId);
+        if (user == null) return NotFound("User not found");
 
-        record.EarnedPoints = pointsToAdd;
-        record.StreakCount = streakCount;
-        record.Date = DateTime.Now;
+        //save the study record
+        _context.StudyRecords.Add(studyRecord);
 
-        _context.StudyRecords.Add(record);
-        await _context.SaveChangesAsync();
+        //  update the user's total score and streak
+        user.TotalScore += studyRecord.EarnedScore;
+        if (user.LastStudyDate.HasValue 
+            && user.LastStudyDate.Value.Date == DateTime.UtcNow.AddDays(-1).Date)
+        {
+            user.StreakDays++;
+        }
+        else if (!user.LastStudyDate.HasValue 
+                 || user.LastStudyDate.Value.Date != DateTime.UtcNow.Date)
+        {
+            user.StreakDays = 1;
+        }
+        user.LastStudyDate = DateTime.UtcNow;
+        studyRecord.StreakCount = user.StreakDays;
 
-        // Check for badges
-        await CheckAndAwardBadges(record.rID, pointsToAdd, streakCount);
+        // record the score entry for the study record
+        var scoreEntry = new ScoreEntry
+        {
+            UserId = studyRecord.UserId,
+            Amount = studyRecord.EarnedScore,
+            Reason = $"complete the study:{studyRecord.Subject}"
+        };
+        _context.Scores.Add(scoreEntry);
 
-        return CreatedAtAction("GetUserStudyRecords", new { userId = record.rID }, record);
-    }
-
-    private async Task CheckAndAwardBadges(int userId, int pointsEarned, int streakCount)
-    {
-        // Check for streak badges
-        var streakBadges = await _context.Badges
-            .Where(b => b.BadgePoints > 0 && streakCount >= b.BadgePoints)
+        // automatically check and unlock badges that meet the score requirement
+        var availableBadges = await _context.Badges
+            .Where(b => b.RequiredScore <= user.TotalScore)
             .ToListAsync();
 
-        foreach (var badge in streakBadges)
+        foreach (var badge in availableBadges)
         {
-            bool alreadyAwarded = await _context.UserBadges
-                .AnyAsync(ub => ub.UserID == userId && ub.BadgeID == badge.BadgeID);
-
-            if (!alreadyAwarded)
+            var alreadyUnlocked = await _context.UserBadges
+                .AnyAsync(ub => ub.UserId == user.Id && ub.BadgeId == badge.Id);
+            if (!alreadyUnlocked)
             {
-                _context.UserBadges.Add(new UserBadge { UserID = userId, BadgeID = badge.BadgeID });
+                _context.UserBadges.Add(new UserBadge
+                {
+                    UserId = user.Id,
+                    BadgeId = badge.Id
+                });
             }
         }
 
         await _context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetStudyRecord), new { id = studyRecord.Id }, studyRecord);
+    }
+
+    // update a study record by id
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutStudyRecord(int id, StudyRecord studyRecord)
+    {
+        if (id != studyRecord.Id) return BadRequest();
+        _context.Entry(studyRecord).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!StudyRecordExists(id)) return NotFound();
+            throw;
+        }
+        return NoContent();
+    }
+
+    // delete a study record by id
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteStudyRecord(int id)
+    {
+        var studyRecord = await _context.StudyRecords.FindAsync(id);
+        if (studyRecord == null) return NotFound();
+
+        _context.StudyRecords.Remove(studyRecord);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    private bool StudyRecordExists(int id)
+    {
+        return _context.StudyRecords.Any(e => e.Id == id);
     }
 }

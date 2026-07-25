@@ -3,59 +3,77 @@ using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+namespace backend.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
-public class UserController : ControllerBase
+public class UsersController : ControllerBase
 {
     private readonly AppDbContext _context;
 
-    public UserController(AppDbContext context)
+    public UsersController(AppDbContext context)
     {
         _context = context;
     }
-
+    
+    // get all users
     [HttpGet]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
         return await _context.Users.ToListAsync();
     }
 
+    // get a single user by id
     [HttpGet("{id}")]
     public async Task<ActionResult<User>> GetUser(int id)
     {
         var user = await _context.Users.FindAsync(id);
-        if (user is null)
-        {
-            return NotFound();
-        }
+        if (user == null) return NotFound();
         return user;
     }
 
-    [HttpPost("register")]
-    public async Task<ActionResult<User>> RegisterUser(User user)
+    // create a new user
+    [HttpPost]
+    public async Task<ActionResult<User>> PostUser(User user)
     {
-        user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetUser), new { id = user.RID }, user);
+        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
     }
 
-    [HttpPost("login")]
-    public async Task<ActionResult<User>> Login([FromBody] LoginRequest request)
+    // update user info (username, email, role) - password change is handled separately
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutUser(int id, User user)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+        if (id != user.Id) return BadRequest();
+        _context.Entry(user).State = EntityState.Modified;
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+        try
         {
-            return Unauthorized("Invalid username or password");
+            await _context.SaveChangesAsync();
         }
-
-        return user;
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!UserExists(id)) return NotFound();
+            throw;
+        }
+        return NoContent();
     }
-}
 
-public class LoginRequest
-{
-    public string Username { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
+    // delete user and cascade delete related StudyRecords, ScoreEntries, and UserBadges
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUser(int id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) return NotFound();
+
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    private bool UserExists(int id)
+    {
+        return _context.Users.Any(e => e.Id == id);
+    }
 }

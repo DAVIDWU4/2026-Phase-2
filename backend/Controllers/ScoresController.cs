@@ -5,62 +5,77 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
+[ApiController]
 public class ScoresController : ControllerBase
 {
-    private readonly AppDbContext _db;
+    private readonly AppDbContext _context;
 
-    public ScoresController(AppDbContext db)
+    public ScoresController(AppDbContext context)
     {
-        _db = db;
+        _context = context;
     }
 
+    // get all score entries
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<ActionResult<IEnumerable<ScoreEntry>>> GetScoreEntries()
     {
-        var scores = await _db.Scores
-            .OrderByDescending(s => s.Score)
-            .ToListAsync();
-        return Ok(scores);
+        return await _context.Scores.Include(se => se.User).ToListAsync();
     }
 
+    // get a single score entry
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<ActionResult<ScoreEntry>> GetScoreEntry(int id)
     {
-        var entry = await _db.Scores.FindAsync(id);
-        if (entry is null) return NotFound();
-        return Ok(entry);
+        var scoreEntry = await _context.Scores
+            .Include(se => se.User)
+            .FirstOrDefaultAsync(se => se.Id == id);
+        if (scoreEntry == null) return NotFound();
+        return scoreEntry;
     }
 
+    // create a new score entry
     [HttpPost]
-    public async Task<IActionResult> Create(ScoreEntry entry)
+    public async Task<ActionResult<ScoreEntry>> PostScoreEntry(ScoreEntry scoreEntry)
     {
-        _db.Scores.Add(entry);
-        await _db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { id = entry.Id }, entry);
+        _context.Scores.Add(scoreEntry);
+        await _context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetScoreEntry), new { id = scoreEntry.Id }, scoreEntry);
     }
 
+    // update a score entry
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, ScoreEntry updated)
+    public async Task<IActionResult> PutScoreEntry(int id, ScoreEntry scoreEntry)
     {
-        var entry = await _db.Scores.FindAsync(id);
-        if (entry is null) return NotFound();
+        if (id != scoreEntry.Id) return BadRequest();
+        _context.Entry(scoreEntry).State = EntityState.Modified;
 
-        entry.PlayerName = updated.PlayerName;
-        entry.Score = updated.Score;
-        await _db.SaveChangesAsync();
-        return Ok(entry);
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ScoreEntryExists(id)) return NotFound();
+            throw;
+        }
+        return NoContent();
     }
 
+    // delete a score entry
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> DeleteScoreEntry(int id)
     {
-        var entry = await _db.Scores.FindAsync(id);
-        if (entry is null) return NotFound();
+        var scoreEntry = await _context.Scores.FindAsync(id);
+        if (scoreEntry == null) return NotFound();
 
-        _db.Scores.Remove(entry);
-        await _db.SaveChangesAsync();
+        _context.Scores.Remove(scoreEntry);
+        await _context.SaveChangesAsync();
         return NoContent();
+    }
+
+    private bool ScoreEntryExists(int id)
+    {
+        return _context.Scores.Any(e => e.Id == id);
     }
 }

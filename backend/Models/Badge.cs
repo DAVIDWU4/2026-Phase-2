@@ -1,19 +1,34 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+namespace backend.Models;
+
 [Table("badge")]
 public class Badge
 {
     [Key]
-    public int BadgeID { get; set; }
+    [Column("id")]
+    public int Id { get; set; }
+
     [Required]
     [MaxLength(50)]
-    public string BadgeName { get; set; } = string.Empty;
-    [MaxLength(255)]
-    public string BadgeImage { get; set; } = string.Empty;
-    [MaxLength(300)]
-    public string BadgeDescription { get; set; } = string.Empty;
-    public int BadgePoints { get; set; }
+    [Column("name")]
+    public string Name { get; set; } = string.Empty;
 
-    public List<User> Users { get; set; } = new List<User>();
+    [MaxLength(255)]
+    [Column("icon")]
+    public string Icon { get; set; } = string.Empty;
+
+    [MaxLength(300)]
+    [Column("description")]
+    public string Description { get; set; } = string.Empty;
+
+
+    [Column("required_score")]
+    public int RequiredScore { get; set; }
+
+    [Column("created_at")]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public ICollection<UserBadge> UserBadges { get; set; } = new List<UserBadge>();
 }

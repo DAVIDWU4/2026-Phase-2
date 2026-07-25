@@ -6,7 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -22,16 +21,14 @@ builder.Services.AddCors(options =>
     });
 });
 
-
-builder.Services.AddScalar(options =>
-{
-    options.Title = "Study Tracker API";
-    options.Description = "学习打卡应用 API 文档";
-});
-
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi(); 
+}
+
+// app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthorization();
 

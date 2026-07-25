@@ -1,17 +1,38 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-[Table("studyRecord")]
+
+namespace backend.Models;
+
+[Table("study_record")]
 public class StudyRecord
 {
     [Key]
-    public int RecordID { get; set; }
-    public int rID { get; set; }
-    [ForeignKey(nameof(rID))]
+    [Column("id")]
+    public int Id { get; set; }
+
+    [Column("user_id")]
+    public int UserId { get; set; }
+
     public User User { get; set; } = null!;
-    public DateTime Date { get; set; }
-    public int Duration { get; set; } // Duration in minutes
+
+    [Column("study_date")]
+    public DateTime StudyDate { get; set; } = DateTime.UtcNow;
+
+
+    [Column("duration_minutes")]
+    public int DurationMinutes { get; set; }
+
+    [MaxLength(100)]
+    [Column("subject")]
     public string Subject { get; set; } = string.Empty;
-    public int EarnedPoints { get; set; }
+
+    [Column("earned_score")]
+    public int EarnedScore { get; set; }
+
+    [Column("streak_count")]
     public int StreakCount { get; set; }
 
+    [MaxLength(500)]
+    [Column("notes")]
+    public string? Notes { get; set; }
 }

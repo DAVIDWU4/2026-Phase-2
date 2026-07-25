@@ -3,6 +3,8 @@ using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+namespace backend.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
 public class BadgesController : ControllerBase
@@ -14,34 +16,64 @@ public class BadgesController : ControllerBase
         _context = context;
     }
 
-    // GET: api/Badges
+    // get all badges
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Badge>>> GetBadges()
     {
         return await _context.Badges.ToListAsync();
     }
 
-    // GET: api/Badges/user/5
-    [HttpGet("user/{userId}")]
-    public async Task<ActionResult<IEnumerable<Badge>>> GetUserBadges(int userId)
+    // get a single badge
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Badge>> GetBadge(int id)
     {
-        var userBadgeIds = await _context.UserBadges
-            .Where(ub => ub.UserID == userId)
-            .Select(ub => ub.BadgeID)
-            .ToListAsync();
-
-        return await _context.Badges
-            .Where(b => userBadgeIds.Contains(b.BadgeID))
-            .ToListAsync();
+        var badge = await _context.Badges.FindAsync(id);
+        if (badge == null) return NotFound();
+        return badge;
     }
 
-    // POST: api/Badges
+    // create a new badge
     [HttpPost]
-    public async Task<ActionResult<Badge>> CreateBadge(Badge badge)
+    public async Task<ActionResult<Badge>> PostBadge(Badge badge)
     {
         _context.Badges.Add(badge);
         await _context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetBadge), new { id = badge.Id }, badge);
+    }
 
-        return CreatedAtAction("GetBadges", new { id = badge.BadgeID }, badge);
+    // update a badge
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutBadge(int id, Badge badge)
+    {
+        if (id != badge.Id) return BadRequest();
+        _context.Entry(badge).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!BadgeExists(id)) return NotFound();
+            throw;
+        }
+        return NoContent();
+    }
+
+    // delete a badge
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteBadge(int id)
+    {
+        var badge = await _context.Badges.FindAsync(id);
+        if (badge == null) return NotFound();
+
+        _context.Badges.Remove(badge);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    private bool BadgeExists(int id)
+    {
+        return _context.Badges.Any(e => e.Id == id);
     }
 }

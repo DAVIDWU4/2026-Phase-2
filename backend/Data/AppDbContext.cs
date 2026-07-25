@@ -57,11 +57,32 @@ public class AppDbContext : DbContext
             .IsRequired()
             .HasMaxLength(50);
 
-        // 7. 可选：种子数据 - 预置3个基础徽章，方便测试
+        // Seed data: 15 badges across 5 progression tracks
         modelBuilder.Entity<Badge>().HasData(
-            new Badge { Id = 1, Name = "初学乍练", Description = "完成第一次学习打卡", Icon = "🌟", RequiredScore = 0 },
-            new Badge { Id = 2, Name = "坚持不懈", Description = "连续打卡7天", Icon = "🔥", RequiredScore = 100 },
-            new Badge { Id = 3, Name = "学霸降临", Description = "累计获得500积分", Icon = "🏆", RequiredScore = 500 }
+            // ========== 1. Total Score Progression ==========
+            new Badge { Id = 1, Name = "First Step", Description = "Complete your first study session", Icon = "🌱", RequiredScore = 0, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Badge { Id = 2, Name = "Rising Star", Description = "Earn 100 total points", Icon = "⭐", RequiredScore = 100, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Badge { Id = 3, Name = "Gaining Momentum", Description = "Earn 300 total points", Icon = "✨", RequiredScore = 300, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Badge { Id = 4, Name = "Honor Student", Description = "Earn 500 total points", Icon = "🏆", RequiredScore = 500, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Badge { Id = 5, Name = "Top Scholar", Description = "Earn 1000 total points", Icon = "👑", RequiredScore = 1000, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+
+            // ========== 2. Study Streak Milestones ==========
+            new Badge { Id = 6, Name = "3-Day Streak", Description = "Study for 3 days in a row", Icon = "🔥", RequiredScore = 0, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Badge { Id = 7, Name = "Week Warrior", Description = "Study for 7 days in a row", Icon = "💪", RequiredScore = 0, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Badge { Id = 8, Name = "Half-Month Hero", Description = "Study for 15 days in a row", Icon = "📅", RequiredScore = 0, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Badge { Id = 9, Name = "Monthly Legend", Description = "Study for 30 days in a row", Icon = "🌟", RequiredScore = 0, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+
+            // ========== 3. Study Time Dedication ==========
+            new Badge { Id = 10, Name = "Hour Starter", Description = "Log 60 minutes of total study time", Icon = "⏱️", RequiredScore = 0, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Badge { Id = 11, Name = "Five-Hour Focus", Description = "Log 300 minutes of total study time", Icon = "⏰", RequiredScore = 0, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Badge { Id = 12, Name = "Ten-Hour Titan", Description = "Log 600 minutes of total study time", Icon = "🕰️", RequiredScore = 0, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+
+            // ========== 4. Subject Exploration ==========
+            new Badge { Id = 13, Name = "Broad Explorer", Description = "Study 3 different subjects", Icon = "📚", RequiredScore = 0, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Badge { Id = 14, Name = "All-Rounder", Description = "Study 5 different subjects", Icon = "🎓", RequiredScore = 0, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+
+            // ========== 5. Special Milestone ==========
+            new Badge { Id = 15, Name = "100-Day Journey", Description = "Check in on 100 total days", Icon = "💯", RequiredScore = 0, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
         );
 
         base.OnModelCreating(modelBuilder);
