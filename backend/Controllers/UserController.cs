@@ -3,22 +3,23 @@ using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+[Route("api/[controller]")]
+[ApiController]
 public class UserController : ControllerBase
 {
     private readonly AppDbContext _context;
+
     public UserController(AppDbContext context)
     {
         _context = context;
     }
 
-    // GET: api/User
     [HttpGet]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
         return await _context.Users.ToListAsync();
     }
 
-    // GET: api/User/5
     [HttpGet("{id}")]
     public async Task<ActionResult<User>> GetUser(int id)
     {
@@ -30,24 +31,21 @@ public class UserController : ControllerBase
         return user;
     }
 
-    // POST: api/User/register
     [HttpPost("register")]
-    public async Task<ActionResult<User>>
-    RegisterUser(User user)
+    public async Task<ActionResult<User>> RegisterUser(User user)
     {
+        user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetUser), new { id = user.RID }, user);
     }
-    
-    // POST: api/Users/login
+
     [HttpPost("login")]
     public async Task<ActionResult<User>> Login([FromBody] LoginRequest request)
     {
-        var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Username == request.Username && u.Password == request.Password);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
 
-        if (user == null)
+        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
         {
             return Unauthorized("Invalid username or password");
         }
