@@ -50,7 +50,7 @@ export interface ScoreEntry {
   Reason: string;
   CreatedAt: string;
 }
-export type NewScoreEntry = Omit<ScoreEntry, "Id">;
+export type NewScoreEntry = Omit<ScoreEntry, "Id" | "CreatedAt">;
 
 // StudyTask
 export interface StudyTask {
@@ -65,13 +65,13 @@ export interface StudyTask {
 }
 export type NewStudyTask = Omit<StudyTask, "Id">;
 
-// 登录请求体
+// login request body (corresponds to backend LoginDto)
 export interface LoginRequest {
   Username: string;
   Password: string;
 }
 
-// 注册请求体（对应后端RegisterDto）
+// register request body (corresponds to backend RegisterDto)
 export interface RegisterRequest {
   Username: string;
   Password: string;

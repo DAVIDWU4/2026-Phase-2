@@ -1,22 +1,22 @@
 import { Link, Outlet } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthStore } from '../stores/authStore'
 
 export default function MainLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthStore();
   return (
     <div className="min-h-screen">
       <nav className="flex items-center gap-6 p-4 bg-slate-100">
-        <Link to="/study">学习打卡</Link>
-        <Link to="/badges">徽章</Link>
-        <Link to="/leaderboard">排行榜</Link>
-        <Link to="/profile">个人中心</Link>
+        <Link to="/study">Study Tracker</Link>
+        <Link to="/badges">Badges</Link>
+        <Link to="/leaderboard">Leaderboard</Link>
+        <Link to="/profile">Profile</Link>
         {user ? (
           <>
-            <span>欢迎，{user.Nickname}</span>
-            <button onClick={logout}>退出登录</button>
+            <span>Welcome, {user.Nickname}</span>
+            <button onClick={logout}>Logout</button>
           </>
         ) : (
-          <Link to="/login">登录/注册</Link>
+          <Link to="/login">Login / Register</Link>
         )}
       </nav>
       <main className="p-6">

@@ -1,28 +1,58 @@
-import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import Leaderboard from './pages/Leaderboard'
 import About from './pages/About'
 import Study from './pages/Study'
+import Login from './pages/Login'
+import Badges from './pages/Badges'
+import Profile from './pages/Profile'
+import MainLayout from './layouts/MainLayout'
+import { useAuthStore } from './stores/authStore'
 import './App.css'
+
+function AppContent() {
+  const { user, loading, restoreSession } = useAuthStore();
+
+  useEffect(() => {
+    restoreSession();
+  }, [restoreSession]);
+
+  if (loading) return <div>Loading...</div>;
+
+  // 受保护路由包装组件
+  const RequireAuth = ({ children }: { children: React.ReactNode }) => {
+    if (!user) return <Navigate to="/login" replace />
+    return children
+  }
+
+  return (
+    <Routes>
+      {/* 登录页面：独立布局，不需要导航栏 */}
+      <Route path="/login" element={<Login />} />
+
+      {/* 需要登录 + 共用导航布局的页面 */}
+      <Route element={
+        <RequireAuth>
+          <MainLayout />
+        </RequireAuth>
+      }>
+        <Route path="/" element={<Leaderboard />} />
+        <Route path="/study" element={<Study />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/badges" element={<Badges />} />
+        <Route path="/profile" element={<Profile />} />
+      </Route>
+
+      {/* 访问不存在路径时重定向首页 */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}
 
 export default function App() {
   return (
     <BrowserRouter>
-      <header>
-        <h1>Study Tracker App</h1>
-        <nav>
-          <NavLink to="/" end>Leaderboard</NavLink>
-          <NavLink to="/study">Study</NavLink>
-          <NavLink to="/about">About</NavLink>
-        </nav>
-      </header>
-
-      <main>
-        <Routes>
-          <Route path="/" element={<Leaderboard />} />
-          <Route path="/study" element={<Study />} />
-          <Route path="/about" element={<About />} />
-        </Routes>
-      </main>
+      <AppContent />
     </BrowserRouter>
   )
 }

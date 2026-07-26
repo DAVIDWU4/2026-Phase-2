@@ -1,92 +1,109 @@
-import type { ScoreEntry, User, StudyRecord, Badge, LoginRequest, RegisterRequest, NewScoreEntry, NewStudyRecord } from './types'
+import type {
+  ScoreEntry, User, StudyRecord, Badge, LoginRequest,
+  RegisterRequest, NewScoreEntry, NewStudyRecord, UserBadge
+} from './types'
 
 const API_ROOT = import.meta.env.VITE_API_ROOT ?? 'http://localhost:5000/api'
 
 // 封装通用fetch工具，统一处理请求头、错误
-async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
+async function apiFetch<T>(url: string, init?: RequestInit): Promise<T | undefined> {
   const fullUrl = `${API_ROOT}${url}`
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    // 后续JWT鉴权在这里注入token
+    // 'Authorization': `Bearer ${useAuthStore.getState().token}`
+  }
+
   const res = await fetch(fullUrl, {
-    headers: {
-      'Content-Type': 'application/json',
-      // 后续登录后可以在这里统一附加 Authorization token
-    },
+    headers,
     ...init
   })
 
   if (!res.ok) {
-    const errText = await res.text().catch(() => 'Unknown error')
-    throw new Error(`Request failed (${res.status}): ${errText}`)
+    let errMsg = 'Unknown error'
+    try {
+      errMsg = await res.text()
+    } catch {}
+    throw new Error(`Request failed (${res.status}): ${errMsg}`)
   }
 
-  // DELETE 请求返回204无内容
-  if (res.status === 204) return undefined as T
+  // DELETE 204 No Content
+  if (res.status === 204) return undefined
   return res.json()
 }
 
 // ========== ScoreEntry 积分流水 ==========
 export async function getScores(): Promise<ScoreEntry[]> {
-  return apiFetch('/scores')
+  return (await apiFetch('/scores')) ?? []
 }
 
 export async function createScore(data: NewScoreEntry): Promise<ScoreEntry> {
-  return apiFetch('/scores', {
+  return await apiFetch('/scores', {
     method: 'POST',
     body: JSON.stringify(data)
-  })
+  }) as ScoreEntry
 }
 
 export async function deleteScore(id: number): Promise<void> {
-  return apiFetch(`/scores/${id}`, { method: 'DELETE' })
+  await apiFetch(`/scores/${id}`, { method: 'DELETE' })
 }
 
 // ========== User 用户 ==========
-// 注册：参数使用 RegisterRequest！
 export async function registerUser(data: RegisterRequest): Promise<User> {
-  return apiFetch('/users/register', {
+  return await apiFetch('/users/register', {
     method: 'POST',
     body: JSON.stringify(data)
-  })
+  }) as User
 }
 
 export async function loginUser(request: LoginRequest): Promise<User> {
-  return apiFetch('/users/login', {
+  return await apiFetch('/users/login', {
     method: 'POST',
     body: JSON.stringify(request)
-  })
+  }) as User
 }
+// 和页面组件保持一致的别名
+export const loginApi = loginUser
+export const registerApi = registerUser
 
 export async function getUserById(userId: number): Promise<User> {
-  return apiFetch(`/users/${userId}`)
+  return await apiFetch(`/users/${userId}`) as User
 }
 
 // ========== StudyRecord 学习记录 ==========
 export async function getStudyRecords(userId: number): Promise<StudyRecord[]> {
-  return apiFetch(`/StudyRecords/user/${userId}`)
+  return (await apiFetch(`/StudyRecords/user/${userId}`)) ?? []
 }
 
 export async function createStudyRecord(record: NewStudyRecord): Promise<StudyRecord> {
-  return apiFetch('/StudyRecords', {
+  return await apiFetch('/StudyRecords', {
     method: 'POST',
     body: JSON.stringify(record)
-  })
+  }) as StudyRecord
 }
 
 export async function updateStudyRecord(id: number, record: Partial<StudyRecord>): Promise<StudyRecord> {
-  return apiFetch(`/StudyRecords/${id}`, {
+  return await apiFetch(`/StudyRecords/${id}`, {
     method: 'PUT',
     body: JSON.stringify(record)
-  })
+  }) as StudyRecord
 }
 
 export async function deleteStudyRecord(id: number): Promise<void> {
-  return apiFetch(`/StudyRecords/${id}`, { method: 'DELETE' })
+  await apiFetch(`/StudyRecords/${id}`, { method: 'DELETE' })
 }
 
 // ========== Badge 徽章 ==========
+// 获取系统全部徽章定义
 export async function getBadges(): Promise<Badge[]> {
-  return apiFetch('/badges')
+  return (await apiFetch('/badges')) ?? []
 }
 
-export async function getUserBadges(userId: number): Promise<Badge[]> {
-  return apiFetch(`/badges/user/${userId}`)
+// 获取【当前用户解锁的徽章记录】（包含BadgeId、解锁时间）
+export async function getUserBadges(userId: number): Promise<UserBadge[]> {
+  return (await apiFetch(`/badges/user/${userId}`)) ?? []
 }
+
+// 别名，匹配你Badges.tsx里面的导入名称
+export const getAllBadges = getBadges
+export const getUserUnlockedBadges = getUserBadges

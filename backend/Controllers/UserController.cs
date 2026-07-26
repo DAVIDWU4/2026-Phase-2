@@ -130,7 +130,7 @@ public class UsersController : ControllerBase
             Username = dto.Username,
             Nickname = dto.Nickname,
             Email = dto.Email,
-            PasswordHash = BCrypt.HashPassword(dto.Password),
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             Role = "user",
             TotalScore = 0,
             Level = 1,
@@ -162,7 +162,7 @@ public class UsersController : ControllerBase
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
         if (user == null) return Unauthorized("用户名不存在");
 
-        bool passValid = BCrypt.Verify(dto.Password, user.PasswordHash);
+        bool passValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
         if (!passValid) return Unauthorized("密码错误");
 
         var output = new UserOutputDto

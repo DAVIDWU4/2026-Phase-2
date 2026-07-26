@@ -1,22 +1,52 @@
+/* ========== 主题变量定义 ========== */
+:root {
+  /* 浅色模式默认值 */
+  --bg-page: #f5f5f5;
+  --bg-header: #1a1a2e;
+  --bg-card: #ffffff;
+  --text-primary: #222222;
+  --text-secondary: #cccccc;
+  --border-normal: #cccccc;
+  --border-error: #dc2626;
+  --accent-color: #e94560;
+  --input-bg: #fff;
+}
+
+[data-theme="dark"] {
+  /* 深色模式 */
+  --bg-page: #12121f;
+  --bg-header: #0f0f1b;
+  --bg-card: #1e1e30;
+  --text-primary: #e8e8e8;
+  --text-secondary: #b8b8b8;
+  --border-normal: #383850;
+  --border-error: #f87171;
+  --accent-color: #e94560;
+  --input-bg: #292942;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 body {
   font-family: system-ui, sans-serif;
-  background: #f5f5f5;
-  color: #222;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
 }
 
+/* ========== 导航头部样式 ========== */
 header {
-  background: #1a1a2e;
+  background-color: var(--bg-header);
   color: white;
   padding: 16px 24px;
   display: flex;
   align-items: center;
   gap: 32px;
+  flex-wrap: wrap;
 }
 
 header h1 {
@@ -26,10 +56,11 @@ header h1 {
 header nav {
   display: flex;
   gap: 16px;
+  align-items: center;
 }
 
 header nav a {
-  color: #ccc;
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.95rem;
 }
@@ -37,12 +68,13 @@ header nav a {
 header nav a.active {
   color: white;
   font-weight: 600;
-  border-bottom: 2px solid #e94560;
+  border-bottom: 2px solid var(--accent-color);
   padding-bottom: 2px;
 }
 
+/* ========== 主体容器 ========== */
 main {
-  max-width: 600px;
+  max-width: 1200px;
   margin: 40px auto;
   padding: 0 16px;
 }
@@ -51,16 +83,28 @@ h2 {
   margin-bottom: 20px;
 }
 
-input {
+/* ========== 表单控件 ========== */
+input,
+textarea,
+select {
   padding: 8px 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-normal);
   border-radius: 6px;
   font-size: 0.95rem;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
 }
 
+/* 登录失败：输入框红色边框类 */
+.input-error {
+  border-color: var(--border-error) !important;
+  outline: 1px solid var(--border-error);
+}
+
+/* ========== 按钮全局 ========== */
 button {
   padding: 8px 16px;
-  background: #1a1a2e;
+  background-color: var(--bg-header);
   color: white;
   border: none;
   border-radius: 6px;
@@ -69,7 +113,29 @@ button {
 }
 
 button:hover {
-  background: #e94560;
+  background-color: var(--accent-color);
+}
+
+/* ========== 卡片通用类（Badges/Profile/Study页面直接使用） ========== */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-normal);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.2rem;
+  margin-top: 2rem;
+}
+
+/* 错误文字样式 */
+.error-text {
+  color: var(--border-error);
+  font-size: 0.9rem;
+  margin-top: 0.4rem;
 }
 
 ol {
@@ -78,5 +144,60 @@ ol {
 
 ol li {
   padding: 8px 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-normal);
+}
+
+
+.auth-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+  padding: 2rem 1rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+[data-theme="dark"] .auth-card {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+
+.auth-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+}
+
+.form-item {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-item label {
+  font-size: 1.05rem;
+}
+
+.form-item input {
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-row button {
+  flex: 1;
+  padding: 0.85rem;
+  font-size: 1rem;
 }

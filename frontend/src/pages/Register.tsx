@@ -1,15 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../stores/authStore'
-import { loginApi } from '../api'
+import { registerApi } from '../api'
 
-export default function Login() {
+export default function Register() {
   const navigate = useNavigate()
-  const loginStore = useAuthStore(s => s.login)
-
   const [form, setForm] = useState({
     Username: '',
-    Password: ''
+    Password: '',
+    Nickname: '',
+    Email: ''
   })
   const [errorMsg, setErrorMsg] = useState('')
   const [hasFieldError, setHasFieldError] = useState(false)
@@ -24,11 +23,11 @@ export default function Login() {
     setErrorMsg('')
     setHasFieldError(false)
     try {
-      const user = await loginApi(form)
-      loginStore(user)
-      navigate('/')
+      await registerApi(form)
+      // 注册成功跳登录
+      navigate('/login')
     } catch (err: any) {
-      setErrorMsg(err.message || '账号或密码错误')
+      setErrorMsg(err.message || '注册失败，请检查信息')
       setHasFieldError(true)
     }
   }
@@ -36,7 +35,7 @@ export default function Login() {
   return (
     <div className="auth-wrap">
       <div className="card auth-card">
-        <h2 className="auth-title">Login</h2>
+        <h2 className="auth-title">Register Account</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-item">
             <label>Username</label>
@@ -57,13 +56,31 @@ export default function Login() {
               className={hasFieldError ? 'input-error' : ''}
             />
           </div>
+          <div className="form-item">
+            <label>Nickname</label>
+            <input
+              name="Nickname"
+              value={form.Nickname}
+              onChange={handleChange}
+              className={hasFieldError ? 'input-error' : ''}
+            />
+          </div>
+          <div className="form-item">
+            <label>Email</label>
+            <input
+              name="Email"
+              value={form.Email}
+              onChange={handleChange}
+              className={hasFieldError ? 'input-error' : ''}
+            />
+          </div>
 
           {errorMsg && <p className="error-text">{errorMsg}</p>}
 
           <div className="btn-row">
-            <button type="submit">Sign In</button>
-            <button type="button" onClick={() => navigate('/register')}>
-              Switch to Register
+            <button type="submit">Submit</button>
+            <button type="button" onClick={() => navigate('/login')}>
+              Switch to Login
             </button>
           </div>
         </form>
