@@ -1,81 +1,92 @@
-import type { ScoreEntry, User, StudyRecord, Badge, LoginRequest } from './types'
+import type { ScoreEntry, User, StudyRecord, Badge, LoginRequest, RegisterRequest, NewScoreEntry, NewStudyRecord } from './types'
 
-const BASE = 'http://localhost:5000/api/scores'
+const API_ROOT = import.meta.env.VITE_API_ROOT ?? 'http://localhost:5000/api'
 
-export async function getScores(): Promise<ScoreEntry[]> {
-  const res = await fetch(BASE)
-  if (!res.ok) throw new Error('Failed to fetch scores')
+// 封装通用fetch工具，统一处理请求头、错误
+async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
+  const fullUrl = `${API_ROOT}${url}`
+  const res = await fetch(fullUrl, {
+    headers: {
+      'Content-Type': 'application/json',
+      // 后续登录后可以在这里统一附加 Authorization token
+    },
+    ...init
+  })
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => 'Unknown error')
+    throw new Error(`Request failed (${res.status}): ${errText}`)
+  }
+
+  // DELETE 请求返回204无内容
+  if (res.status === 204) return undefined as T
   return res.json()
 }
 
-export async function createScore(playerName: string, score: number): Promise<ScoreEntry> {
-  const res = await fetch(BASE, {
+// ========== ScoreEntry 积分流水 ==========
+export async function getScores(): Promise<ScoreEntry[]> {
+  return apiFetch('/scores')
+}
+
+export async function createScore(data: NewScoreEntry): Promise<ScoreEntry> {
+  return apiFetch('/scores', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ playerName, score }),
+    body: JSON.stringify(data)
   })
-  if (!res.ok) throw new Error('Failed to create score')
-  return res.json()
 }
 
 export async function deleteScore(id: number): Promise<void> {
-  const res = await fetch(`${BASE}/${id}`, { method: 'DELETE' })
-  if (!res.ok) throw new Error('Failed to delete score')
+  return apiFetch(`/scores/${id}`, { method: 'DELETE' })
 }
 
-
-const USERS_BASE = 'http://localhost:5000/api/users'
-
-export async function registerUser(user: Omit<User, 'RID'>): Promise<User> {
-  const res = await fetch(`${USERS_BASE}/register`, {
+// ========== User 用户 ==========
+// 注册：参数使用 RegisterRequest！
+export async function registerUser(data: RegisterRequest): Promise<User> {
+  return apiFetch('/users/register', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(user),
+    body: JSON.stringify(data)
   })
-  if (!res.ok) throw new Error('Failed to register')
-  return res.json()
 }
 
 export async function loginUser(request: LoginRequest): Promise<User> {
-  const res = await fetch(`${USERS_BASE}/login`, {
+  return apiFetch('/users/login', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
+    body: JSON.stringify(request)
   })
-  if (!res.ok) throw new Error('Login failed')
-  return res.json()
 }
 
-// 学习记录 API
-const STUDY_RECORDS_BASE = 'http://localhost:5000/api/studyrecords'
+export async function getUserById(userId: number): Promise<User> {
+  return apiFetch(`/users/${userId}`)
+}
 
+// ========== StudyRecord 学习记录 ==========
 export async function getStudyRecords(userId: number): Promise<StudyRecord[]> {
-  const res = await fetch(`${STUDY_RECORDS_BASE}/user/${userId}`)
-  if (!res.ok) throw new Error('Failed to fetch study records')
-  return res.json()
+  return apiFetch(`/StudyRecords/user/${userId}`)
 }
 
-export async function createStudyRecord(record: Omit<StudyRecord, 'RecordID' | 'EarnedPoints' | 'StreakCount'>): Promise<StudyRecord> {
-  const res = await fetch(STUDY_RECORDS_BASE, {
+export async function createStudyRecord(record: NewStudyRecord): Promise<StudyRecord> {
+  return apiFetch('/StudyRecords', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(record),
+    body: JSON.stringify(record)
   })
-  if (!res.ok) throw new Error('Failed to create study record')
-  return res.json()
 }
 
-// 徽章 API
-const BADGES_BASE = 'http://localhost:5000/api/badges'
+export async function updateStudyRecord(id: number, record: Partial<StudyRecord>): Promise<StudyRecord> {
+  return apiFetch(`/StudyRecords/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(record)
+  })
+}
 
+export async function deleteStudyRecord(id: number): Promise<void> {
+  return apiFetch(`/StudyRecords/${id}`, { method: 'DELETE' })
+}
+
+// ========== Badge 徽章 ==========
 export async function getBadges(): Promise<Badge[]> {
-  const res = await fetch(BADGES_BASE)
-  if (!res.ok) throw new Error('Failed to fetch badges')
-  return res.json()
+  return apiFetch('/badges')
 }
 
 export async function getUserBadges(userId: number): Promise<Badge[]> {
-  const res = await fetch(`${BADGES_BASE}/user/${userId}`)
-  if (!res.ok) throw new Error('Failed to fetch user badges')
-  return res.json()
+  return apiFetch(`/badges/user/${userId}`)
 }

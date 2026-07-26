@@ -2,6 +2,8 @@ using backend.Data;
 using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using backend.Dtos;
+using BCrypt.Net;
 
 namespace backend.Controllers;
 
@@ -18,30 +20,72 @@ public class UsersController : ControllerBase
     
     // get all users
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+    public async Task<ActionResult<IEnumerable<UserOutputDto>>> GetUsers()
     {
-        return await _context.Users.ToListAsync();
+        var users = await _context.Users.ToListAsync();
+        var result = users.Select(u => new UserOutputDto
+        {
+            Id = u.Id,
+            Username = u.Username,
+            Nickname = u.Nickname,
+            Email = u.Email,
+            Role = u.Role,
+            TotalScore = u.TotalScore,
+            Level = u.Level,
+            StreakDays = u.StreakDays,
+            LastStudyDate = u.LastStudyDate,
+            CreatedAt = u.CreatedAt
+        });
+        return Ok(result);
     }
 
     // get a single user by id
     [HttpGet("{id}")]
-    public async Task<ActionResult<User>> GetUser(int id)
+    public async Task<ActionResult<UserOutputDto>> GetUser(int id)
     {
         var user = await _context.Users.FindAsync(id);
         if (user == null) return NotFound();
-        return user;
+
+        return new UserOutputDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Nickname = user.Nickname,
+            Email = user.Email,
+            Role = user.Role,
+            TotalScore = user.TotalScore,
+            Level = user.Level,
+            StreakDays = user.StreakDays,
+            LastStudyDate = user.LastStudyDate,
+            CreatedAt = user.CreatedAt
+        };
     }
 
-    // create a new user
+    // 【管理员接口】直接创建用户实体（后台使用，前端注册不要调用这个）
     [HttpPost]
-    public async Task<ActionResult<User>> PostUser(User user)
+    public async Task<ActionResult<UserOutputDto>> PostUser(User user)
     {
+        // 管理员调用时，外部必须传入加密好的 PasswordHash
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+
+        var output = new UserOutputDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Nickname = user.Nickname,
+            Email = user.Email,
+            Role = user.Role,
+            TotalScore = user.TotalScore,
+            Level = user.Level,
+            StreakDays = user.StreakDays,
+            LastStudyDate = user.LastStudyDate,
+            CreatedAt = user.CreatedAt
+        };
+        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, output);
     }
 
-    // update user info (username, email, role) - password change is handled separately
+    // update user info
     [HttpPut("{id}")]
     public async Task<IActionResult> PutUser(int id, User user)
     {
@@ -60,7 +104,7 @@ public class UsersController : ControllerBase
         return NoContent();
     }
 
-    // delete user and cascade delete related StudyRecords, ScoreEntries, and UserBadges
+    // delete user
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(int id)
     {
@@ -70,6 +114,71 @@ public class UsersController : ControllerBase
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
         return NoContent();
+    }
+
+    // ============ 新增：前端登录注册接口 ============
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(RegisterDto dto)
+    {
+        bool nameUsed = await _context.Users.AnyAsync(u => u.Username == dto.Username);
+        bool emailUsed = await _context.Users.AnyAsync(u => u.Email == dto.Email);
+        if (nameUsed) return BadRequest("用户名已存在");
+        if (emailUsed) return BadRequest("邮箱已存在");
+
+        var newUser = new User
+        {
+            Username = dto.Username,
+            Nickname = dto.Nickname,
+            Email = dto.Email,
+            PasswordHash = BCrypt.HashPassword(dto.Password),
+            Role = "user",
+            TotalScore = 0,
+            Level = 1,
+            StreakDays = 0
+        };
+
+        _context.Users.Add(newUser);
+        await _context.SaveChangesAsync();
+
+        var output = new UserOutputDto
+        {
+            Id = newUser.Id,
+            Username = newUser.Username,
+            Nickname = newUser.Nickname,
+            Email = newUser.Email,
+            Role = newUser.Role,
+            TotalScore = newUser.TotalScore,
+            Level = newUser.Level,
+            StreakDays = newUser.StreakDays,
+            LastStudyDate = newUser.LastStudyDate,
+            CreatedAt = newUser.CreatedAt
+        };
+        return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, output);
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginDto dto)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
+        if (user == null) return Unauthorized("用户名不存在");
+
+        bool passValid = BCrypt.Verify(dto.Password, user.PasswordHash);
+        if (!passValid) return Unauthorized("密码错误");
+
+        var output = new UserOutputDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Nickname = user.Nickname,
+            Email = user.Email,
+            Role = user.Role,
+            TotalScore = user.TotalScore,
+            Level = user.Level,
+            StreakDays = user.StreakDays,
+            LastStudyDate = user.LastStudyDate,
+            CreatedAt = user.CreatedAt
+        };
+        return Ok(output);
     }
 
     private bool UserExists(int id)
