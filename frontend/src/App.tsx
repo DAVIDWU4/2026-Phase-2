@@ -4,11 +4,12 @@ import Leaderboard from './pages/Leaderboard'
 import About from './pages/About'
 import Study from './pages/Study'
 import Login from './pages/Login'
+import Register from './pages/Register'
 import Badges from './pages/Badges'
 import Profile from './pages/Profile'
 import MainLayout from './layouts/MainLayout'
 import { useAuthStore } from './stores/authStore'
-import './App.css'
+
 
 function AppContent() {
   const { user, loading, restoreSession } = useAuthStore();
@@ -27,8 +28,9 @@ function AppContent() {
 
   return (
     <Routes>
-      {/* 登录页面：独立布局，不需要导航栏 */}
+      {/* 登录/注册页面：独立布局，不需要导航栏 */}
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       {/* 需要登录 + 共用导航布局的页面 */}
       <Route element={

@@ -5,7 +5,7 @@ import { loginUser, registerUser } from '../api';
 interface AuthState {
   user: User | null;
   loading: boolean;
-  login: (payload: LoginRequest) => Promise<void>;
+  login: (userData: User) => void;
   register: (payload: RegisterRequest) => Promise<void>;
   logout: () => void;
   restoreSession: () => void;
@@ -29,8 +29,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  login: async (payload) => {
-    const userData = await loginUser(payload);
+  login: (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
     set({ user: userData });
   },
