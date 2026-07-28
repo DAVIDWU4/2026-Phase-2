@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerApi } from '../api';
+import { useAuthStore } from '../stores/authStore';
 import ThemeToggle from '../components/ThemeToggle';
 
 export default function Register() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
+  const register = useAuthStore(s => s.register);
+  const [form, setForm] = useState<{ Username: string; Password: string; Nickname: string; Email: string }>({
     Username: '',
     Password: '',
     Nickname: '',
@@ -24,10 +25,11 @@ export default function Register() {
     setErrorMsg('');
     setHasFieldError(false);
     try {
-      await registerApi(form);
+      await register(form);
       navigate('/login');
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Registration failed. Please check your information.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setErrorMsg(message || 'Registration failed. Please check your information.');
       setHasFieldError(true);
     }
   };

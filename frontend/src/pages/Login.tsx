@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { loginApi } from '../api';
 import ThemeToggle from '../components/ThemeToggle';
 
 export default function Login() {
   const navigate = useNavigate();
-  const loginStore = useAuthStore(s => s.login);
+  const authenticate = useAuthStore(s => s.authenticate);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{ Username: string; Password: string }>({
     Username: '',
     Password: ''
   });
@@ -25,11 +24,11 @@ export default function Login() {
     setErrorMsg('');
     setHasFieldError(false);
     try {
-      const user = await loginApi(form);
-      loginStore(user);
+      await authenticate(form);
       navigate('/');
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Username or password is incorrect');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setErrorMsg(message || 'Username or password is incorrect');
       setHasFieldError(true);
     }
   };
@@ -111,6 +110,14 @@ export default function Login() {
               className="w-full btn-outline text-base py-3"
             >
               Create New Account
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/forgot-password')}
+              className="w-full btn-secondary text-base py-3"
+            >
+              Forgot password?
             </button>
           </form>
         </div>

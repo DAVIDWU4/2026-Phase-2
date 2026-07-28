@@ -1,6 +1,7 @@
 import type {
   ScoreEntry, User, StudyRecord, Badge, LoginRequest,
-  RegisterRequest, NewScoreEntry, NewStudyRecord, UserBadge
+  RegisterRequest, PasswordResetRequest, PasswordResetConfirmRequest,
+  NewScoreEntry, NewStudyRecord, UserBadge
 } from './types'
 
 const API_ROOT = import.meta.env.VITE_API_ROOT ?? 'http://localhost:5000/api'
@@ -23,7 +24,9 @@ async function apiFetch<T>(url: string, init?: RequestInit): Promise<T | undefin
     let errMsg = 'Unknown error'
     try {
       errMsg = await res.text()
-    } catch {}
+    } catch (error) {
+      console.error('apiFetch failed reading error text:', error)
+    }
     throw new Error(`Request failed (${res.status}): ${errMsg}`)
   }
 
@@ -81,6 +84,20 @@ export const registerApi = registerUser
 
 export async function getUserById(userId: number): Promise<User> {
   return await apiFetch(`/users/${userId}`) as User
+}
+
+export async function requestPasswordReset(data: PasswordResetRequest): Promise<{ Message: string }> {
+  return await apiFetch('/users/password-reset-request', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }) as { Message: string }
+}
+
+export async function confirmPasswordReset(data: PasswordResetConfirmRequest): Promise<{ Message: string }> {
+  return await apiFetch('/users/password-reset-confirm', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }) as { Message: string }
 }
 
 // ========== StudyRecord 学习记录 ==========

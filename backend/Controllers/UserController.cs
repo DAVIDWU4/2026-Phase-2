@@ -1,5 +1,6 @@
 using backend.Data;
 using backend.Models;
+using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Dtos;
@@ -12,10 +13,12 @@ namespace backend.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly PasswordResetService _passwordResetService;
 
-    public UsersController(AppDbContext context)
+    public UsersController(AppDbContext context, PasswordResetService passwordResetService)
     {
         _context = context;
+        _passwordResetService = passwordResetService;
     }
     
     // get all users
@@ -179,6 +182,36 @@ public class UsersController : ControllerBase
             CreatedAt = user.CreatedAt
         };
         return Ok(output);
+    }
+
+    [HttpPost("password-reset-request")]
+    public async Task<IActionResult> RequestPasswordReset(PasswordResetRequestDto dto)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+        if (user != null)
+        {
+            var code = _passwordResetService.CreateResetCode(dto.Email);
+            Console.WriteLine($"Password reset code for {dto.Email}: {code}");
+        }
+
+        return Ok(new { Message = "If the email exists, a reset code has been sent." });
+    }
+
+    [HttpPost("password-reset-confirm")]
+    public async Task<IActionResult> ConfirmPasswordReset(PasswordResetConfirmDto dto)
+    {
+        if (!_passwordResetService.ValidateResetCode(dto.Email, dto.Code))
+        {
+            return BadRequest("Invalid or expired reset code.");
+        }
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+        if (user == null) return BadRequest("Invalid reset request.");
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { Message = "Password has been reset successfully." });
     }
 
     private bool UserExists(int id)

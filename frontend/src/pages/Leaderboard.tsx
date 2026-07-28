@@ -19,21 +19,21 @@ export default function Leaderboard() {
   const [isLoading, setIsLoading] = useState(false);
 
   // 获取用户分数排行榜（按总分排序）
-  const loadLeaderboard = async () => {
-    setIsLoading(true);
-    try {
-      const data = await getLeaderboard();
-      setLeaderboard(data);
-      setError('');
-    } catch {
-      setError('Could not reach the backend. Is it running on port 5000?');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadLeaderboard();
+    const fetchLeaderboard = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getLeaderboard();
+        setLeaderboard(data);
+        setError('');
+      } catch {
+        setError('Could not reach the backend. Is it running on port 5000?');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchLeaderboard();
   }, []);
 
   const getRankIcon = (index: number) => {

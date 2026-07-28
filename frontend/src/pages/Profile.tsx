@@ -62,11 +62,9 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
-    if (currentUser) {
-      setProfileInfo(currentUser);
-    }
-  }, [currentUser]);
+  const displayUser = profileInfo ?? currentUser;
+
+  // profileInfo is only used when the user refreshes their data
 
   // 处理头像上传
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {

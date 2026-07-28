@@ -78,3 +78,15 @@ export interface RegisterRequest {
   Nickname: string;
   Email: string;
 }
+
+// forgot password request body
+export interface PasswordResetRequest {
+  Email: string;
+}
+
+// password reset confirmation request body
+export interface PasswordResetConfirmRequest {
+  Email: string;
+  Code: string;
+  NewPassword: string;
+}

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useAuthStore } from '../stores/authStore';
-import type { Badge, UserBadge } from '../types';
+import type { Badge } from '../types';
 
 const mockBadges: Badge[] = [
   { Id: 1, Name: 'Newbie', Description: 'Complete your first study session', RequiredScore: 0, Icon: '🌱' },
@@ -15,28 +15,12 @@ const mockBadges: Badge[] = [
 
 export default function Badges() {
   const user = useAuthStore(state => state.user);
-  const [allBadges, setAllBadges] = useState<Badge[]>([]);
-  const [unlockedBadgeIds, setUnlockedBadgeIds] = useState<number[]>([]);
-  const [message, setMessage] = useState('');
-
-  const loadBadgeData = async () => {
-    try {
-      setAllBadges(mockBadges);
-      if (user?.TotalScore) {
-        const unlocked = mockBadges.filter(b => b.RequiredScore <= user.TotalScore).map(b => b.Id);
-        setUnlockedBadgeIds(unlocked);
-      }
-    } catch {
-      setMessage('Failed to load badge data');
-    }
-  };
-
-  useEffect(() => {
-    if (user) loadBadgeData();
-  }, [user]);
-
+  const unlockedBadgeIds = useMemo(
+    () => user ? mockBadges.filter(b => b.RequiredScore <= user.TotalScore).map(b => b.Id) : [],
+    [user]
+  );
   const unlockedCount = unlockedBadgeIds.length;
-  const totalCount = allBadges.length;
+  const totalCount = mockBadges.length;
 
   return (
     <div className="animate-fade-in">
@@ -56,16 +40,7 @@ export default function Badges() {
         </div>
       </div>
 
-      {message && (
-        <div className="flex items-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 mb-6">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
-          {message}
-        </div>
-      )}
-
-      {allBadges.length === 0 ? (
+      {mockBadges.length === 0 ? (
         <div className="card text-center py-12">
           <span className="text-5xl block mb-4">🏆</span>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No badges loaded</h3>
@@ -73,7 +48,7 @@ export default function Badges() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {allBadges.map((badge) => {
+          {mockBadges.map((badge) => {
             const isUnlocked = unlockedBadgeIds.includes(badge.Id);
             return (
               <div

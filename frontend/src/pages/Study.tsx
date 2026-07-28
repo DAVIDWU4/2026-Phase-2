@@ -14,7 +14,7 @@ const subjects = [
 
 export default function Study() {
   const user = useAuthStore(state => state.user);
-  const userId = user?.Id ?? (user as any)?.id ?? 0;
+  const userId = user?.Id ?? 0;
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [duration, setDuration] = useState('');
   const [notes, setNotes] = useState('');
@@ -24,7 +24,7 @@ export default function Study() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
-    const dur = parseInt(duration);
+    const dur = parseInt(duration, 10);
     if (!selectedSubject || !dur) {
       setMessage('Please select a subject and enter duration');
       setMessageType('error');
@@ -47,7 +47,7 @@ export default function Study() {
       setDuration('');
       setSelectedSubject('');
       setNotes('');
-      loadRecords();
+      void fetchRecords();
     } catch (err) {
       console.error('Failed to create record:', err);
       setMessage('❌ Failed to log study session. Is backend running?');
@@ -57,7 +57,7 @@ export default function Study() {
     }
   };
 
-  const loadRecords = async () => {
+  const fetchRecords = async () => {
     if (!user || !userId) return;
     setIsLoading(true);
     try {
@@ -74,8 +74,12 @@ export default function Study() {
   };
 
   useEffect(() => {
-    loadRecords();
-  }, [user]);
+    const fetch = async () => {
+      await fetchRecords();
+    };
+
+    void fetch();
+  }, [userId, user]);
 
   const formatDuration = (minutes: number) => {
     if (minutes >= 60) {
