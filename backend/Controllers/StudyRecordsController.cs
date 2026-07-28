@@ -39,6 +39,14 @@ public class StudyRecordsController(StudyGameService studyGameService) : Control
         return Ok(records);
     }
 
+
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetByUserId(int userId)
+    {
+        var records = await _studyGameService.GetStudyRecordsByUserIdAsync(userId);
+        return Ok(records);
+    }
+
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] StudyRecord record)
     {

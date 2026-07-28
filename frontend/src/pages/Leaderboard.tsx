@@ -1,21 +1,29 @@
 import { useEffect, useState } from 'react';
-import { getScores, createScore, deleteScore } from '../api';
-import type { ScoreEntry } from '../types';
+import { getLeaderboard } from '../api';
 import { useAuthStore } from '../stores/authStore';
+
+interface LeaderboardEntry {
+  UserId: number;
+  Amount: number;
+  Reason: string;
+  Username: string;
+  Nickname: string;
+  Level: number;
+  StreakDays: number;
+}
 
 export default function Leaderboard() {
   const user = useAuthStore(state => state.user);
-  const [scoreList, setScoreList] = useState<ScoreEntry[]>([]);
-  const [reason, setReason] = useState('');
-  const [amount, setAmount] = useState('');
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const loadScores = async () => {
+  // 获取用户分数排行榜（按总分排序）
+  const loadLeaderboard = async () => {
     setIsLoading(true);
     try {
-      const data = await getScores();
-      setScoreList(data);
+      const data = await getLeaderboard();
+      setLeaderboard(data);
       setError('');
     } catch {
       setError('Could not reach the backend. Is it running on port 5000?');
@@ -25,44 +33,8 @@ export default function Leaderboard() {
   };
 
   useEffect(() => {
-    loadScores();
+    loadLeaderboard();
   }, []);
-
-  const handleAddScore = async () => {
-    const numAmount = parseInt(amount);
-    if (!reason.trim() || isNaN(numAmount)) {
-      setError('Please fill in both reason and amount');
-      return;
-    }
-    setIsLoading(true);
-    try {
-      await createScore({
-        UserId: user!.Id,
-        Amount: numAmount,
-        Reason: reason.trim(),
-      });
-      setReason('');
-      setAmount('');
-      setError('');
-      loadScores();
-    } catch {
-      setError('Failed to add score entry');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDeleteScore = async (entryId: number) => {
-    setIsLoading(true);
-    try {
-      await deleteScore(entryId);
-      loadScores();
-    } catch {
-      setError('Failed to delete score entry');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const getRankIcon = (index: number) => {
     if (index === 0) return '🥇';
@@ -78,14 +50,40 @@ export default function Leaderboard() {
     return 'bg-gray-50 dark:bg-dark-700/50 border-gray-200 dark:border-dark-600';
   };
 
+  const getRankTextColor = (index: number) => {
+    if (index === 0) return 'text-yellow-600 dark:text-yellow-400';
+    if (index === 1) return 'text-gray-600 dark:text-gray-400';
+    if (index === 2) return 'text-orange-600 dark:text-orange-400';
+    return 'text-gray-700 dark:text-gray-300';
+  };
+
+  // 计算当前用户排名
+  const getUserRank = () => {
+    if (!user) return null;
+    const userEntryIndex = leaderboard.findIndex(entry => entry.UserId === user.Id);
+    return userEntryIndex >= 0 ? userEntryIndex + 1 : null;
+  };
+
+  const userRank = getUserRank();
+
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center gap-3 mb-6">
-        <span className="text-3xl">🏆</span>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Score Leaderboard</h1>
-          <p className="text-gray-500 dark:text-gray-400">Track your progress and compete with others</p>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">🏆</span>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Score Leaderboard</h1>
+            <p className="text-gray-500 dark:text-gray-400">Track your progress and compete with others</p>
+          </div>
         </div>
+        {user && userRank && (
+          <div className="flex items-center gap-2 px-4 py-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+            <span className="text-primary-600 dark:text-primary-400">Your Rank:</span>
+            <span className="text-xl font-bold text-primary-700 dark:text-primary-300">
+              {userRank === 1 ? '🥇' : userRank === 2 ? '🥈' : userRank === 3 ? '🥉' : `#${userRank}`}
+            </span>
+          </div>
+        )}
       </div>
 
       {error && (
@@ -97,98 +95,57 @@ export default function Leaderboard() {
         </div>
       )}
 
-      <div className="card mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Add New Score</h2>
-        <div className="flex flex-wrap gap-4">
-          <div className="flex-1 min-w-[200px]">
-            <input
-              type="text"
-              placeholder="Reason for score"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              className="input-field w-full"
-            />
-          </div>
-          <div className="w-[120px]">
-            <input
-              type="number"
-              placeholder="Points"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="input-field w-full"
-            />
-          </div>
-          <button
-            onClick={handleAddScore}
-            disabled={isLoading}
-            className="btn-primary whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <span className="flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Adding...
-              </span>
-            ) : (
-              'Add Score'
-            )}
-          </button>
-        </div>
-      </div>
-
-      {isLoading && scoreList.length === 0 ? (
+      {isLoading && leaderboard.length === 0 ? (
         <div className="card text-center py-12">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-200 dark:border-primary-800 border-t-primary-600 dark:border-t-primary-400 mb-4"></div>
-          <p className="text-gray-500 dark:text-gray-400">Loading scores...</p>
+          <p className="text-gray-500 dark:text-gray-400">Loading leaderboard...</p>
         </div>
-      ) : scoreList.length === 0 ? (
+      ) : leaderboard.length === 0 ? (
         <div className="card text-center py-12">
           <span className="text-5xl block mb-4">📊</span>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No score records yet</h3>
-          <p className="text-gray-500 dark:text-gray-400">Be the first to add a score!</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No users yet</h3>
+          <p className="text-gray-500 dark:text-gray-400">Be the first to start studying!</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {scoreList.map((entry, index) => (
-            <div
-              key={entry.Id}
-              className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-md ${getRankBg(index)}`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span className="text-2xl font-bold w-10">{getRankIcon(index)}</span>
-                  <div>
-                    <div className="font-semibold text-gray-900 dark:text-gray-100">
-                      User {entry.UserId}
-                      {user?.Id === entry.UserId && (
-                        <span className="ml-2 px-2 py-0.5 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full">You</span>
-                      )}
+          {leaderboard.map((entry, index) => {
+            const isCurrentUser = user?.Id === entry.UserId;
+            
+            return (
+              <div
+                key={entry.UserId}
+                className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-md ${getRankBg(index)} ${isCurrentUser ? 'ring-2 ring-primary-500' : ''}`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl font-bold w-10">{getRankIcon(index)}</span>
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold">
+                      {entry.Nickname?.charAt(0).toUpperCase() || entry.Username?.charAt(0).toUpperCase() || '?'}
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{entry.Reason}</p>
+                    <div>
+                      <div className="font-semibold text-gray-900 dark:text-gray-100">
+                        {entry.Nickname || entry.Username}
+                        {isCurrentUser && (
+                          <span className="ml-2 px-2 py-0.5 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full">You</span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Level {entry.Level} | {entry.StreakDays} day streak
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-2xl font-bold ${getRankTextColor(index)}`}>
+                      {entry.Amount} pts
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {entry.Reason}
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className={`text-2xl font-bold ${
-                    index === 0 ? 'text-yellow-600 dark:text-yellow-400' :
-                    index === 1 ? 'text-gray-600 dark:text-gray-400' :
-                    index === 2 ? 'text-orange-600 dark:text-orange-400' :
-                    'text-gray-700 dark:text-gray-300'
-                  }`}>
-                    +{entry.Amount} pts
-                  </span>
-                  <button
-                    onClick={() => handleDeleteScore(entry.Id)}
-                    disabled={isLoading}
-                    className="btn-danger disabled:opacity-50"
-                  >
-                    Remove
-                  </button>
-                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -10,7 +10,7 @@ public class StudyGameService(AppDbContext dbContext)
 
     /// <summary>
     /// Process submitted study record:
-    /// Save record, add earned score to user, create score log, unlock eligible badges
+    /// Save record, calculate score based on duration, add earned score to user, create score log, unlock eligible badges
     /// </summary>
     /// <param name="record">User submitted study session</param>
     /// <returns>Saved study record entity</returns>
@@ -25,7 +25,14 @@ public class StudyGameService(AppDbContext dbContext)
             throw new KeyNotFoundException("The specified user cannot be found.");
         }
 
-        user.TotalScore += record.EarnedScore;
+        // Calculate score: 1 point per 10 minutes of study
+        int earnedScore = record.DurationMinutes / 10;
+        record.EarnedScore = earnedScore;
+
+        // Calculate streak
+        record.StreakCount = await CalculateStreakAsync(user.Id, record.StudyDate);
+
+        user.TotalScore += earnedScore;
 
         var scoreEntry = new ScoreEntry
         {
@@ -71,6 +78,16 @@ public class StudyGameService(AppDbContext dbContext)
         return await _db.StudyRecords.FindAsync(id);
     }
 
+
+    public async Task<List<StudyRecord>> GetStudyRecordsByUserIdAsync(int userId)
+    {
+        return await _db.StudyRecords
+            .Where(r => r.UserId == userId)
+           .ToListAsync();
+    }
+
+
+
     public async Task<bool> UpdateStudyRecordAsync(int id, StudyRecord updatedRecord)
     {
         var entity = await _db.StudyRecords.FindAsync(id);
@@ -93,5 +110,45 @@ public class StudyGameService(AppDbContext dbContext)
         _db.StudyRecords.Remove(entity);
         await _db.SaveChangesAsync();
         return true;
+    }
+
+    /// <summary>
+    /// Calculate the current streak count for a user based on their study history
+    /// </summary>
+    /// <param name="userId">The user ID</param>
+    /// <param name="currentDate">The date of the current study record</param>
+    /// <returns>The streak count</returns>
+    private async Task<int> CalculateStreakAsync(int userId, DateTime currentDate)
+    {
+        int streak = 1;
+        
+        // Get all study records for the user, ordered by date descending
+        var records = await _db.StudyRecords
+            .Where(r => r.UserId == userId && r.StudyDate < currentDate)
+            .OrderByDescending(r => r.StudyDate)
+            .ToListAsync();
+
+        DateTime previousDate = currentDate.Date;
+        
+        foreach (var record in records)
+        {
+            DateTime recordDate = record.StudyDate.Date;
+            TimeSpan difference = previousDate - recordDate;
+            
+            // If the previous record is exactly one day before, continue the streak
+            if (difference.Days == 1)
+            {
+                streak++;
+                previousDate = recordDate;
+            }
+            // If there's a gap larger than one day, break the streak
+            else if (difference.Days > 1)
+            {
+                break;
+            }
+            // If same day, skip (don't increment streak)
+        }
+
+        return streak;
     }
 }

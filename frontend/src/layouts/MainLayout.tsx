@@ -48,13 +48,18 @@ export default function MainLayout() {
 
             <div className="flex items-center gap-3">
               {user && (
-                <div className="hidden md:flex items-center gap-3">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Welcome, <span className="font-semibold text-primary-600 dark:text-primary-400">{user.Nickname}</span>
-                  </span>
+                <div className="hidden md:flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-sm font-bold">
+                      {(user.Nickname || user.Username)?.charAt(0).toUpperCase() || '?'}
+                    </div>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      Hi, <span className="font-semibold text-primary-600 dark:text-primary-400">{user.Nickname || user.Username || 'User'}</span>
+                    </span>
+                  </div>
                   <button
                     onClick={logout}
-                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 transition-colors"
+                    className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 transition-colors"
                   >
                     Logout
                   </button>

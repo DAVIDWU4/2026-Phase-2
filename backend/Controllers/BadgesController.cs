@@ -32,6 +32,17 @@ public class BadgesController : ControllerBase
         return badge;
     }
 
+
+    // get badges unlocked by user
+    [HttpGet("user/{userId}")]
+    public async Task<ActionResult<IEnumerable<UserBadge>>> GetUserBadges(int userId)
+    {
+       var userBadges = await _context.UserBadges
+            .Where(ub => ub.UserId == userId)
+            .ToListAsync();
+        return Ok(userBadges);
+    }
+
     // create a new badge
     [HttpPost]
     public async Task<ActionResult<Badge>> PostBadge(Badge badge)

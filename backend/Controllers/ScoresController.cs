@@ -23,6 +23,38 @@ public class ScoresController : ControllerBase
         return await _context.Scores.Include(se => se.User).ToListAsync();
     }
 
+    // get leaderboard - users sorted by total score
+    [HttpGet("leaderboard")]
+    public async Task<ActionResult<IEnumerable<object>>> GetLeaderboard()
+    {
+        var leaderboard = await _context.Users
+            .OrderByDescending(u => u.TotalScore)
+            .Select(u => new
+            {
+                u.Id,
+                u.Username,
+                u.Nickname,
+                u.TotalScore,
+                u.Level,
+                u.StreakDays
+            })
+            .ToListAsync();
+
+        // Create score entries for leaderboard display
+        var result = leaderboard.Select(user => new
+        {
+            UserId = user.Id,
+            Amount = user.TotalScore,
+            Reason = "Total Score",
+            Username = user.Username,
+            Nickname = user.Nickname,
+            Level = user.Level,
+            StreakDays = user.StreakDays
+        });
+
+        return Ok(result);
+    }
+
     // get a single score entry
     [HttpGet("{id}")]
     public async Task<ActionResult<ScoreEntry>> GetScoreEntry(int id)

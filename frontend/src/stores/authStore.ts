@@ -18,14 +18,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   restoreSession: () => {
     try {
       const saved = localStorage.getItem('user');
+      console.log('restoreSession - saved from localStorage:', saved);
       if (saved) {
         const userData = JSON.parse(saved) as User;
+        console.log('restoreSession - parsed user data:', userData);
         set({ user: userData });
       }
-    } catch {
+    } catch (err) {
+      console.error('restoreSession - error:', err);
       localStorage.removeItem('user');
     } finally {
       set({ loading: false });
+      console.log('restoreSession - completed, loading set to false');
     }
   },
 

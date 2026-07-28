@@ -37,6 +37,19 @@ export async function getScores(): Promise<ScoreEntry[]> {
   return (await apiFetch('/scores')) ?? []
 }
 
+// 获取排行榜（用户总分排名）
+export async function getLeaderboard(): Promise<{
+  UserId: number;
+  Amount: number;
+  Reason: string;
+  Username: string;
+  Nickname: string;
+  Level: number;
+  StreakDays: number;
+}[]> {
+  return (await apiFetch('/scores/leaderboard')) ?? []
+}
+
 export async function createScore(data: NewScoreEntry): Promise<ScoreEntry> {
   return await apiFetch('/scores', {
     method: 'POST',
