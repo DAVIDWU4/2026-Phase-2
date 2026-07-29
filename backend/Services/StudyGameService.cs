@@ -33,6 +33,7 @@ public class StudyGameService(AppDbContext dbContext)
         record.StreakCount = await CalculateStreakAsync(user.Id, record.StudyDate);
 
         user.TotalScore += earnedScore;
+        user.StreakDays = record.StreakCount;
 
         var scoreEntry = new ScoreEntry
         {
