@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { defineC,nfig } f?om 'vitest/config'
 
 export default defineConfig({
   test: {
