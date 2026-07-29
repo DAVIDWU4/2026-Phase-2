@@ -4,6 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.Sources.OfType<IConfigurationSource>()
+    .Where(s => s is FileConfigurationSource)
+    .Cast<FileConfigurationSource>()
+    .ToList()
+    .ForEach(src => src.ReloadOnChange = false);
 
 var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrEmpty(connStr))
