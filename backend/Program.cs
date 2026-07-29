@@ -5,6 +5,14 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connStr))
+{
+    throw new InvalidOperationException(
+        "Database connection string 'DefaultConnection' is not configured. " +
+        "Set the ConnectionStrings__DefaultConnection environment variable.");
+}
+
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
@@ -29,7 +37,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSingleton<PasswordResetService>();
 
-builder.Services.AddDbContext<AppDbContext>(options =>options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connStr));
 
 builder.Services.AddScoped<backend.Services.StudyGameService>();    
 
