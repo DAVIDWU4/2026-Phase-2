@@ -21,13 +21,27 @@ async function apiFetch<T>(url: string, init?: RequestInit): Promise<T | undefin
   })
 
   if (!res.ok) {
-    let errMsg = 'Unknown error'
+    let errMsg = 'Request failed.'
     try {
-      errMsg = await res.text()
-    } catch (error) {
-      console.error('apiFetch failed reading error text:', error)
+      const text = await res.text()
+      try {
+        const parsed = JSON.parse(text)
+        if (parsed.errors && typeof parsed.errors === 'object') {
+          const firstKey = Object.keys(parsed.errors)[0]
+          const firstMsg = parsed.errors[firstKey]?.[0]
+          if (firstMsg) errMsg = firstMsg
+        } else if (parsed.message) {
+          errMsg = parsed.message
+        } else if (typeof parsed === 'string') {
+          errMsg = parsed
+        }
+      } catch {
+        errMsg = text || `Request failed (${res.status})`
+      }
+    } catch {
+      errMsg = `Request failed (${res.status})`
     }
-    throw new Error(`Request failed (${res.status}): ${errMsg}`)
+    throw new Error(errMsg)
   }
 
   // DELETE 204 No Content
@@ -35,7 +49,7 @@ async function apiFetch<T>(url: string, init?: RequestInit): Promise<T | undefin
   return res.json()
 }
 
-// ========== ScoreEntry ==========
+//ScoreEntry
 export async function getScores(): Promise<ScoreEntry[]> {
   return (await apiFetch('/scores')) ?? []
 }
@@ -64,7 +78,7 @@ export async function deleteScore(id: number): Promise<void> {
   await apiFetch(`/scores/${id}`, { method: 'DELETE' })
 }
 
-// ========== User ==========
+//User
 export async function registerUser(data: RegisterRequest): Promise<User> {
   return await apiFetch('/users/register', {
     method: 'POST',

@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialPostgres : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,13 +18,13 @@ namespace backend.Migrations
                 name: "badge",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    icon = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    description = table.Column<string>(type: "TEXT", maxLength: 300, nullable: false),
-                    required_score = table.Column<int>(type: "INTEGER", nullable: false),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    icon = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    description = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
+                    required_score = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,18 +35,18 @@ namespace backend.Migrations
                 name: "users",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    username = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    password_hash = table.Column<string>(type: "TEXT", nullable: false),
-                    nickname = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    email = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    role = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    total_score = table.Column<int>(type: "INTEGER", nullable: false),
-                    level = table.Column<int>(type: "INTEGER", nullable: false),
-                    streak_days = table.Column<int>(type: "INTEGER", nullable: false),
-                    last_study_date = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    username = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    password_hash = table.Column<string>(type: "text", nullable: false),
+                    nickname = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    role = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    total_score = table.Column<int>(type: "integer", nullable: false),
+                    level = table.Column<int>(type: "integer", nullable: false),
+                    streak_days = table.Column<int>(type: "integer", nullable: false),
+                    last_study_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,12 +57,12 @@ namespace backend.Migrations
                 name: "score_entry",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    user_id = table.Column<int>(type: "INTEGER", nullable: false),
-                    amount = table.Column<int>(type: "INTEGER", nullable: false),
-                    reason = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    amount = table.Column<int>(type: "integer", nullable: false),
+                    reason = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,15 +79,15 @@ namespace backend.Migrations
                 name: "study_record",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    user_id = table.Column<int>(type: "INTEGER", nullable: false),
-                    study_date = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    duration_minutes = table.Column<int>(type: "INTEGER", nullable: false),
-                    subject = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    earned_score = table.Column<int>(type: "INTEGER", nullable: false),
-                    streak_count = table.Column<int>(type: "INTEGER", nullable: false),
-                    notes = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true)
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    study_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    duration_minutes = table.Column<int>(type: "integer", nullable: false),
+                    subject = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    earned_score = table.Column<int>(type: "integer", nullable: false),
+                    streak_count = table.Column<int>(type: "integer", nullable: false),
+                    notes = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -103,9 +104,9 @@ namespace backend.Migrations
                 name: "user_badge",
                 columns: table => new
                 {
-                    user_id = table.Column<int>(type: "INTEGER", nullable: false),
-                    badge_id = table.Column<int>(type: "INTEGER", nullable: false),
-                    unlocked_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    badge_id = table.Column<int>(type: "integer", nullable: false),
+                    unlocked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {

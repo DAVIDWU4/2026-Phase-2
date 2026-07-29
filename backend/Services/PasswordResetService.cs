@@ -1,11 +1,24 @@
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using Microsoft.Extensions.Configuration;
 
 namespace backend.Services;
 
 public sealed class PasswordResetService
 {
     private readonly ConcurrentDictionary<string, PasswordResetEntry> _store = new();
+    private readonly string _sendGridKey;
+    private readonly string _senderMail;
+    private readonly string _senderName;
+
+    public PasswordResetService(IConfiguration configuration)
+    {
+        _sendGridKey = configuration["SendGrid__ApiKey"] ?? throw new InvalidOperationException("SendGrid ApiKey not configured");
+        _senderMail = configuration["SendGrid__SenderEmail"] ?? throw new InvalidOperationException("SenderEmail not configured");
+        _senderName = configuration["SendGrid__SenderName"] ?? "Study Tracker";
+    }
 
     public string CreateResetCode(string email)
     {
@@ -16,13 +29,33 @@ public sealed class PasswordResetService
         return code;
     }
 
+    public async Task SendResetMailAsync(string targetEmail, string code)
+    {
+        Console.WriteLine($"Password reset code for {targetEmail}: {code}");
+
+        var client = new SendGridClient(_sendGridKey);
+        var mail = new SendGridMessage
+        {
+            From = new EmailAddress(_senderMail, _senderName),
+            Subject = "Password Reset Verification Code",
+            PlainTextContent = $"Your reset code: {code}\nValid for 10 minutes.",
+            HtmlContent = $"<h3>Password Reset</h3><p>Your verification code: <strong>{code}</strong></p><p>Valid within 10 minutes.</p>"
+        };
+        mail.AddTo(new EmailAddress(targetEmail));
+
+        var response = await client.SendEmailAsync(mail);
+        if (!response.IsSuccessStatusCode)
+        {
+            var err = await response.Body.ReadAsStringAsync();
+            throw new Exception($"Send mail failed: {err}");
+        }
+    }
+
     public bool ValidateResetCode(string email, string code)
     {
         var normalizedEmail = NormalizeEmail(email);
         if (!_store.TryGetValue(normalizedEmail, out var entry))
-        {
             return false;
-        }
 
         if (DateTime.UtcNow > entry.ExpiresAt)
         {
@@ -31,9 +64,7 @@ public sealed class PasswordResetService
         }
 
         if (!string.Equals(entry.Code, code?.Trim(), StringComparison.Ordinal))
-        {
             return false;
-        }
 
         _store.TryRemove(normalizedEmail, out _);
         return true;
