@@ -35,7 +35,8 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSingleton<PasswordResetService>();
+// 修复：Singleton → Scoped
+builder.Services.AddScoped<PasswordResetService>();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connStr));
 
@@ -43,11 +44,13 @@ builder.Services.AddScoped<backend.Services.StudyGameService>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
+        //填入你的前端域名
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowCredentials();
     });
 });
 
@@ -59,7 +62,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapControllers();
