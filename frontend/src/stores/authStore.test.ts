@@ -1,15 +1,15 @@
+/// <reference types="vitest" />
 import { describe, beforeEach, expect, it, vi } from 'vitest';
 import { useAuthStore } from './authStore';
-import { loginUser, registerUser } from '../api';
+import { loginUser } from '../api';
 
 vi.mock('../api', () => ({
   loginUser: vi.fn(),
-  registerUser: vi.fn(),
 }));
 
 describe('authStore', () => {
   beforeEach(() => {
-    useAuthStore.setState({ user: null, loading: false }, true);
+    useAuthStore.setState({ user: null, loading: false });
     localStorage.clear();
     vi.clearAllMocks();
   });
@@ -28,7 +28,8 @@ describe('authStore', () => {
       CreatedAt: '2026-07-29T00:00:00.000Z',
     };
 
-    (loginUser as unknown as vi.Mock).mockResolvedValue(fakeUser);
+    const mockedLoginUser = loginUser as unknown as { mockResolvedValue: (value: unknown) => void };
+    mockedLoginUser.mockResolvedValue(fakeUser);
 
     await useAuthStore.getState().authenticate({ Username: 'test', Password: 'pass' });
 
@@ -48,7 +49,7 @@ describe('authStore', () => {
       StreakDays: 0,
       LastStudyDate: null,
       CreatedAt: '2026-07-29T00:00:00.000Z',
-    }, loading: false }, true);
+    }, loading: false });
 
     localStorage.setItem('user', JSON.stringify(useAuthStore.getState().user));
     useAuthStore.getState().logout();

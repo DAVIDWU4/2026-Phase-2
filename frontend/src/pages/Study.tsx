@@ -241,7 +241,7 @@ export default function Study() {
               )}
             </button>
             <button
-              onClick={loadRecords}
+              onClick={fetchRecords}
               disabled={isLoading}
               className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
             >

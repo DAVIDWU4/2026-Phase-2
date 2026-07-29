@@ -1,4 +1,6 @@
 import { render, screen } from '@testing-library/react';
+/// <reference types="vitest" />
+import '@testing-library/jest-dom';
 import { describe, expect, it, beforeEach } from 'vitest';
 import { useAuthStore } from '../stores/authStore';
 import Badges from './Badges';
@@ -18,11 +20,11 @@ const defaultUser = {
 
 describe('Badges page', () => {
   beforeEach(() => {
-    useAuthStore.setState({ user: null, loading: false }, true);
+    useAuthStore.setState({ user: null, loading: false });
   });
 
   it('renders unlocked badge count based on user score', () => {
-    useAuthStore.setState({ user: defaultUser, loading: false }, true);
+    useAuthStore.setState({ user: defaultUser, loading: false });
 
     render(<Badges />);
 

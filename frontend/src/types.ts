@@ -32,7 +32,7 @@ export interface Badge {
   Icon: string;
   Description: string;
   RequiredScore: number;
-  CreatedAt: string;
+  CreatedAt?: string;
 }
 
 // UserBadge

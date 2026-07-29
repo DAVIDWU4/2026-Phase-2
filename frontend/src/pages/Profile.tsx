@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import type { User } from '../types';
 import { getUserById } from '../api';
@@ -14,8 +14,7 @@ const formatDate = (dateString: string | null): string => {
   }
 };
 
-// 默认头像颜色
-// 默认头像颜色
+// Default avatar colors
 const avatarColors = [
   'bg-gradient-to-br from-red-400 to-red-600',
   'bg-gradient-to-br from-orange-400 to-orange-600',
@@ -36,7 +35,7 @@ export default function Profile() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 根据用户名获取头像颜色
+  // Get avatar color from username
   const getAvatarColor = (username: string) => {
     let hash = 0;
     for (let i = 0; i < username.length; i++) {
@@ -45,7 +44,7 @@ export default function Profile() {
     return avatarColors[Math.abs(hash) % avatarColors.length];
   };
 
-  // 从后端刷新用户数据
+  // Refresh user data from backend
   const refreshUserData = async () => {
     if (!currentUser?.Id) return;
     
@@ -62,11 +61,9 @@ export default function Profile() {
     }
   };
 
-  const displayUser = profileInfo ?? currentUser;
-
   // profileInfo is only used when the user refreshes their data
 
-  // 处理头像上传
+  // Handle avatar upload
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;

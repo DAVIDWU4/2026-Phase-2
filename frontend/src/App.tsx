@@ -31,13 +31,13 @@ function AppContent() {
 
   return (
     <Routes>
-      {/* 登录/注册页面：独立布局，不需要导航栏 */}
+      {/* Auth pages use a separate layout without the nav bar */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
-      {/* 需要登录 + 共用导航布局的页面 */}
+      {/* Pages that require login and share the nav layout */}
       <Route element={
         <RequireAuth>
           <MainLayout />
@@ -50,7 +50,7 @@ function AppContent() {
         <Route path="/profile" element={<Profile />} />
       </Route>
 
-      {/* 访问不存在路径时重定向首页 */}
+      {/* Redirect unknown paths to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

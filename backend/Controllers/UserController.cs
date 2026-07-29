@@ -64,11 +64,11 @@ public class UsersController : ControllerBase
         };
     }
 
-    // 【管理员接口】直接创建用户实体（后台使用，前端注册不要调用这个）
+    // Admin endpoint for creating users. Not for frontend registration.
     [HttpPost]
     public async Task<ActionResult<UserOutputDto>> PostUser(User user)
     {
-        // 管理员调用时，外部必须传入加密好的 PasswordHash
+        // Admin callers must pass a hashed password.
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
@@ -119,7 +119,7 @@ public class UsersController : ControllerBase
         return NoContent();
     }
 
-    // ============ 新增：前端登录注册接口 ============
+    // ============ Added frontend login/register endpoints ============
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {

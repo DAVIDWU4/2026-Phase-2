@@ -18,7 +18,7 @@ export default function Leaderboard() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // 获取用户分数排行榜（按总分排序）
+  // Get leaderboard sorted by total score
   useEffect(() => {
     const fetchLeaderboard = async () => {
       setIsLoading(true);
@@ -57,7 +57,7 @@ export default function Leaderboard() {
     return 'text-gray-700 dark:text-gray-300';
   };
 
-  // 计算当前用户排名
+  // Compute current user rank
   const getUserRank = () => {
     if (!user) return null;
     const userEntryIndex = leaderboard.findIndex(entry => entry.UserId === user.Id);
