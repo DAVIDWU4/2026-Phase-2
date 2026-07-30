@@ -40,7 +40,6 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 
-// 修复：Singleton → Scoped
 builder.Services.AddScoped<PasswordResetService>();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connStr));
@@ -51,8 +50,17 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        //填入你的前端域名
-        policy.WithOrigins("http://localhost:5173")
+        var origins = builder.Configuration["AllowedOrigins"]?
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(o => o.Trim())
+            .ToArray();
+
+        if (origins == null || origins.Length == 0)
+        {
+            origins = new[] { "http://localhost:5173" };
+        }
+
+        policy.WithOrigins(origins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

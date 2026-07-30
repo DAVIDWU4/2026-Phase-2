@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "g6YzdLlAS2Q=",
+  "dgSpecHash": "Y2R0O33SWDA=",
   "success": true,
-  "projectFilePath": "c:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
+  "projectFilePath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\david\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\david\\.nuget\\packages\\coverlet.collector\\6.0.4\\coverlet.collector.6.0.4.nupkg.sha512",
@@ -47,9 +47,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "backend 依赖于 SQLitePCLRaw.lib.e_sqlite3 (>= 2.1.15)，但没有找到 SQLitePCLRaw.lib.e_sqlite3 2.1.15。已改为解析 SQLitePCLRaw.lib.e_sqlite3 3.50.3。",
-      "projectPath": "c:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
+      "projectPath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
       "warningLevel": 1,
-      "filePath": "c:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
+      "filePath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
       "libraryId": "SQLitePCLRaw.lib.e_sqlite3",
       "targetGraphs": [
         "net10.0"
@@ -59,9 +59,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "包 \"Microsoft.OpenApi\" 2.0.0 具有已知的 高 严重性漏洞，https://github.com/advisories/GHSA-v5pm-xwqc-g5wc",
-      "projectPath": "c:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
+      "projectPath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
       "warningLevel": 1,
-      "filePath": "c:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
+      "filePath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
       "libraryId": "Microsoft.OpenApi",
       "targetGraphs": [
         "net10.0"

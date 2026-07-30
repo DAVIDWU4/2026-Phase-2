@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj": {}
+    "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj": {}
   },
   "projects": {
-    "c:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj": {
+    "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
+        "projectUniqueName": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
         "projectName": "backend.UnitTests",
-        "projectPath": "c:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
+        "projectPath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
         "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\obj\\",
+        "outputPath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

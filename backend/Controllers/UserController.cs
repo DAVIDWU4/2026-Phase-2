@@ -191,7 +191,14 @@ public class UsersController : ControllerBase
         if (user != null)
         {
             var code = _passwordResetService.CreateResetCode(dto.Email);
-            Console.WriteLine($"Password reset code for {dto.Email}: {code}");
+            try
+            {
+                await _passwordResetService.SendResetMailAsync(dto.Email, code);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send password reset email to {dto.Email}: {ex.Message}");
+            }
         }
 
         return Ok(new { Message = "If the email exists, a reset code has been sent." });
