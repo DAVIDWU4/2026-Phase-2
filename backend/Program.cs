@@ -40,35 +40,27 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 
-// 修复：Singleton → Scoped
 builder.Services.AddScoped<PasswordResetService>();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connStr));
 
 builder.Services.AddScoped<backend.Services.StudyGameService>();    
 
-var allowedOrigins = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-{
-    "http://localhost:5173",
-    "https://2026-phase-2.vercel.app",
-};
-
-// Optional: Cors__Origins="https://foo.vercel.app,https://bar.vercel.app"
-var extraOrigins = builder.Configuration["Cors:Origins"]
-    ?? Environment.GetEnvironmentVariable("Cors__Origins");
-if (!string.IsNullOrWhiteSpace(extraOrigins))
-{
-    foreach (var origin in extraOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-    {
-        allowedOrigins.Add(origin);
-    }
-}
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(allowedOrigins.ToArray())
+        var origins = builder.Configuration["AllowedOrigins"]?
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(o => o.Trim())
+            .ToArray();
+
+        if (origins == null || origins.Length == 0)
+        {
+            origins = new[] { "http://localhost:5173" };
+        }
+
+        policy.WithOrigins(origins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -93,4 +85,5 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
 }
-app.Run();
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+app.Run($"http://0.0.0.0:{port}");
