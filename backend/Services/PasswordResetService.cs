@@ -9,15 +9,18 @@ namespace backend.Services;
 public sealed class PasswordResetService
 {
     private readonly ConcurrentDictionary<string, PasswordResetEntry> _store = new();
-    private readonly string _sendGridKey;
-    private readonly string _senderMail;
+    private readonly string? _sendGridKey;
+    private readonly string? _senderMail;
     private readonly string _senderName;
 
     public PasswordResetService(IConfiguration configuration)
     {
-        _sendGridKey = configuration["SendGrid__ApiKey"] ?? throw new InvalidOperationException("SendGrid ApiKey not configured");
-        _senderMail = configuration["SendGrid__SenderEmail"] ?? throw new InvalidOperationException("SenderEmail not configured");
-        _senderName = configuration["SendGrid__SenderName"] ?? "Study Tracker";
+        // Env vars use SendGrid__ApiKey; IConfiguration maps that to SendGrid:ApiKey
+        _sendGridKey = configuration["SendGrid:ApiKey"] ?? configuration["SendGrid__ApiKey"];
+        _senderMail = configuration["SendGrid:SenderEmail"] ?? configuration["SendGrid__SenderEmail"];
+        _senderName = configuration["SendGrid:SenderName"]
+            ?? configuration["SendGrid__SenderName"]
+            ?? "Study Tracker";
     }
 
     public string CreateResetCode(string email)
@@ -32,6 +35,12 @@ public sealed class PasswordResetService
     public async Task SendResetMailAsync(string targetEmail, string code)
     {
         Console.WriteLine($"Password reset code for {targetEmail}: {code}");
+
+        if (string.IsNullOrWhiteSpace(_sendGridKey) || string.IsNullOrWhiteSpace(_senderMail))
+        {
+            throw new InvalidOperationException(
+                "SendGrid is not configured. Set SendGrid__ApiKey and SendGrid__SenderEmail.");
+        }
 
         var client = new SendGridClient(_sendGridKey);
         var mail = new SendGridMessage
