@@ -1,11 +1,30 @@
 using backend.Data;
 using backend.Services;
 using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Support Render's PORT environment variable (common on PaaS platforms)
+// If PORT is set but ASPNETCORE_URLS is not, auto-configure the URL
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port) && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPNETCORE_URLS")))
+{
+    builder.WebHost.UseUrls($"http://+:{port}");
+    Console.WriteLine($"[Host] Listening on port {port} (from PORT env var)");
+}
+
+// Configure forwarded headers for reverse proxy (Render, nginx, etc.)
+// Required so the app knows it's running behind HTTPS when proxied
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // Disable appsettings hot-reload in production; keep it in development for debugging
 if (!builder.Environment.IsDevelopment())
@@ -80,6 +99,13 @@ allowedOrigins.AddRange(new[]
 });
 allowedOrigins = allowedOrigins.Distinct().ToList();
 
+// Log configured origins for debugging
+Console.WriteLine($"[CORS] Configured allowed origins: {string.Join(", ", allowedOrigins)}");
+if (allowedOrigins.Count <= 2) // only localhost defaults
+{
+    Console.WriteLine("[CORS] WARNING: Only localhost origins configured. Set AllowedOrigins env var for production.");
+}
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -87,13 +113,16 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(allowedOrigins.ToArray())
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowCredentials()
+              .SetPreflightMaxAge(TimeSpan.FromHours(1));
     });
 });
 
 var app = builder.Build();
 
 // Middleware order must not be changed
+// Forwarded headers must be first so HTTPS is detected correctly behind proxy
+app.UseForwardedHeaders();
 app.UseCookiePolicy();
 app.UseCors("AllowFrontend");
 app.UseAuthorization();
@@ -107,12 +136,15 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-// Auto-run database migrations only in development; production must run manually
-if (app.Environment.IsDevelopment())
+// Auto-run database migrations on startup (controlled by env var, default: enabled)
+// Set AutoMigrate=false to disable (e.g. if you run migrations manually via CI)
+var autoMigrate = app.Configuration["AutoMigrate"] ?? "true";
+if (autoMigrate.Equals("true", StringComparison.OrdinalIgnoreCase))
 {
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
+    Console.WriteLine("[DB] Database migrations applied successfully.");
 }
 
 app.Run();
