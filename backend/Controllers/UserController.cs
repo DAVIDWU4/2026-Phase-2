@@ -125,8 +125,8 @@ public class UsersController : ControllerBase
     {
         bool nameUsed = await _context.Users.AnyAsync(u => u.Username == dto.Username);
         bool emailUsed = await _context.Users.AnyAsync(u => u.Email == dto.Email);
-        if (nameUsed) return BadRequest("用户名已存在");
-        if (emailUsed) return BadRequest("邮箱已存在");
+        if (nameUsed) return BadRequest("Username already exists");
+        if (emailUsed) return BadRequest("Email already exists");
 
         var newUser = new User
         {
@@ -163,10 +163,10 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Login(LoginDto dto)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
-        if (user == null) return Unauthorized("用户名不存在");
+        if (user == null) return Unauthorized("Username does not exist");
 
         bool passValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
-        if (!passValid) return Unauthorized("密码错误");
+        if (!passValid) return Unauthorized("Incorrect password");
 
         var output = new UserOutputDto
         {
@@ -181,6 +181,16 @@ public class UsersController : ControllerBase
             LastStudyDate = user.LastStudyDate,
             CreatedAt = user.CreatedAt
         };
+        var cookieOptions = new CookieOptions
+        {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.None,
+        Path = "/",
+        Expires = DateTime.UtcNow.AddDays(7)
+        };
+        Response.Cookies.Append("UserId", user.Id.ToString(), cookieOptions);
+
         return Ok(output);
     }
 

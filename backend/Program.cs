@@ -1,15 +1,23 @@
 using backend.Data;
 using backend.Services;
+using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.Sources.OfType<IConfigurationSource>()
-    .Where(s => s is FileConfigurationSource)
-    .Cast<FileConfigurationSource>()
-    .ToList()
-    .ForEach(src => src.ReloadOnChange = false);
 
+// Disable appsettings hot-reload in production; keep it in development for debugging
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Configuration.Sources.OfType<IConfigurationSource>()
+        .Where(s => s is FileConfigurationSource)
+        .Cast<FileConfigurationSource>()
+        .ToList()
+        .ForEach(src => src.ReloadOnChange = false);
+}
+
+// Validate database connection string
 var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrEmpty(connStr))
 {
@@ -18,7 +26,8 @@ if (string.IsNullOrEmpty(connStr))
         "Set the ConnectionStrings__DefaultConnection environment variable.");
 }
 
-builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
+// Custom model validation 400 error response format
+builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
     {
@@ -28,7 +37,7 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options 
                 kvp => kvp.Key,
                 kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray()
             );
-        var result = new Microsoft.AspNetCore.Mvc.ObjectResult(new { message = "Validation failed.", errors })
+        var result = new ObjectResult(new { message = "Validation failed.", errors })
         {
             StatusCode = StatusCodes.Status400BadRequest
         };
@@ -36,33 +45,40 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options 
     };
 });
 
+// Enable standard HTTP ProblemDetails errors
+builder.Services.AddProblemDetails();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 
-// 修复：Singleton → Scoped
+// Register business services
 builder.Services.AddScoped<PasswordResetService>();
+builder.Services.AddScoped<StudyGameService>();
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connStr));
+// Postgres database context
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connStr));
 
-builder.Services.AddScoped<backend.Services.StudyGameService>();    
-
-var allowedOrigins = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+// Global cookie policy: compatible with Vercel <-> Render cross-domain
+builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-    "http://localhost:5173",
-    "https://2026-phase-2-a14s7e708-zehengw2-6613s-projects.vercel.app",
-};
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.Secure = CookieSecurePolicy.Always;
+});
 
-// Optional: Cors__Origins="https://foo.vercel.app,https://bar.vercel.app"
-var extraOrigins = builder.Configuration["Cors:Origins"]
-    ?? Environment.GetEnvironmentVariable("Cors__Origins");
-if (!string.IsNullOrWhiteSpace(extraOrigins))
+// CORS configuration: read Render env var AllowedOrigins, with AllowCredentials support
+var originConfig = builder.Configuration["AllowedOrigins"] ?? string.Empty;
+var allowedOrigins = originConfig
+    .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    .ToList();
+
+// Fallback local development origins
+allowedOrigins.AddRange(new[]
 {
-    foreach (var origin in extraOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-    {
-        allowedOrigins.Add(origin);
-    }
-}
+    "http://localhost:3000",
+    "http://localhost:5173"
+});
+allowedOrigins = allowedOrigins.Distinct().ToList();
 
 builder.Services.AddCors(options =>
 {
@@ -77,20 +93,26 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi(); 
-}
-
-// app.UseHttpsRedirection();
+// Middleware order must not be changed
+app.UseCookiePolicy();
 app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapScalarApiReference();
-using (var scope = app.Services.CreateScope())
+
+// API docs only visible in development, hidden in production
+if (app.Environment.IsDevelopment())
 {
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
+
+// Auto-run database migrations only in development; production must run manually
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
 }
+
 app.Run();

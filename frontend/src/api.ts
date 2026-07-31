@@ -17,6 +17,7 @@ async function apiFetch<T>(url: string, init?: RequestInit): Promise<T | undefin
 
   const res = await fetch(fullUrl, {
     headers,
+    credentials: "include",
     ...init
   })
 
