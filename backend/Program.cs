@@ -91,13 +91,11 @@ var allowedOrigins = originConfig
     .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
     .ToList();
 
-// Fallback local development origins
 allowedOrigins.AddRange(new[]
 {
     "http://localhost:3000",
     "http://localhost:5173"
 });
-allowedOrigins = allowedOrigins.Distinct().ToList();
 
 // Log configured origins for debugging
 Console.WriteLine($"[CORS] Configured allowed origins: {string.Join(", ", allowedOrigins)}");
