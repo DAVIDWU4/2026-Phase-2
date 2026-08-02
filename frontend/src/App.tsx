@@ -12,7 +12,7 @@ import Badges from './pages/Badges'
 import Profile from './pages/Profile'
 import MainLayout from './layouts/MainLayout'
 import { useAuthStore } from './stores/authStore'
-
+import { useTranslation } from './i18n/useTranslation'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const user = useAuthStore(state => state.user);
@@ -22,22 +22,21 @@ function RequireAuth({ children }: { children: ReactNode }) {
 
 function AppContent() {
   const { loading, restoreSession } = useAuthStore();
+  const { t } = useTranslation();
 
   useEffect(() => {
     restoreSession();
   }, [restoreSession]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center">{t('app.loading')}</div>;
 
   return (
     <Routes>
-      {/* Auth pages use a separate layout without the nav bar */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
-      {/* Pages that require login and share the nav layout */}
       <Route element={
         <RequireAuth>
           <MainLayout />
@@ -50,7 +49,6 @@ function AppContent() {
         <Route path="/profile" element={<Profile />} />
       </Route>
 
-      {/* Redirect unknown paths to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

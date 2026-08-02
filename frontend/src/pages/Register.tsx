@@ -2,23 +2,30 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import ThemeToggle from '../components/ThemeToggle';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import { useTranslation } from '../i18n/useTranslation';
+import type { TranslationKey } from '../i18n/translations';
 
 type FormErrors = Partial<Record<'Username' | 'Password' | 'Email', string>>;
 
-function validate(form: { Username: string; Password: string; Email: string }): FormErrors {
+function validate(
+  form: { Username: string; Password: string; Email: string },
+  t: (key: TranslationKey) => string
+): FormErrors {
   const errors: FormErrors = {};
-  if (!form.Username.trim()) errors.Username = 'Username is required.';
-  else if (form.Username.trim().length < 3) errors.Username = 'Username must be at least 3 characters.';
-  if (!form.Password) errors.Password = 'Password is required.';
-  else if (form.Password.length < 6) errors.Password = 'Password must be at least 6 characters.';
-  if (!form.Email.trim()) errors.Email = 'Email is required.';
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.Email.trim())) errors.Email = 'Invalid email address.';
+  if (!form.Username.trim()) errors.Username = t('register.err.usernameRequired');
+  else if (form.Username.trim().length < 3) errors.Username = t('register.err.usernameMin');
+  if (!form.Password) errors.Password = t('register.err.passwordRequired');
+  else if (form.Password.length < 6) errors.Password = t('register.err.passwordMin');
+  if (!form.Email.trim()) errors.Email = t('register.err.emailRequired');
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.Email.trim())) errors.Email = t('register.err.emailInvalid');
   return errors;
 }
 
 export default function Register() {
   const navigate = useNavigate();
   const register = useAuthStore(s => s.register);
+  const { t } = useTranslation();
   const [form, setForm] = useState<{ Username: string; Password: string; Nickname: string; Email: string }>({
     Username: '',
     Password: '',
@@ -33,7 +40,7 @@ export default function Register() {
     setForm(prev => ({ ...prev, [name]: value }));
     if (name === 'Username' || name === 'Password' || name === 'Email') {
       const next = { ...form, [name]: value };
-      const errs = validate(next);
+      const errs = validate(next, t);
       setFieldErrors(prev => ({ ...prev, [name]: errs[name as keyof FormErrors] || undefined }));
       if (errorMsg) setErrorMsg('');
     }
@@ -42,7 +49,7 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    const errs = validate(form);
+    const errs = validate(form, t);
     setFieldErrors(errs);
     if (Object.keys(errs).length > 0) return;
     try {
@@ -50,7 +57,7 @@ export default function Register() {
       navigate('/login');
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      setErrorMsg(message || 'Registration failed. Please check your information.');
+      setErrorMsg(message || t('register.errorDefault'));
     }
   };
 
@@ -71,72 +78,38 @@ export default function Register() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-2xl mb-4">
               <span className="text-3xl">🚀</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Create Account</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">Start your learning journey today</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('register.title')}</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">{t('register.subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Username
-              </label>
-              <input
-                name="Username"
-                value={form.Username}
-                onChange={handleChange}
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('register.username')}</label>
+              <input name="Username" value={form.Username} onChange={handleChange}
                 className={`input-field ${fieldErrors.Username ? 'input-error' : ''}`}
-                placeholder="Choose a username (min 3 chars)"
-              />
-              {fieldErrors.Username && (
-                <p className="mt-1 text-xs text-red-500 dark:text-red-400">{fieldErrors.Username}</p>
-              )}
+                placeholder={t('register.usernamePlaceholder')} />
+              {fieldErrors.Username && <p className="mt-1 text-xs text-red-500 dark:text-red-400">{fieldErrors.Username}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                name="Password"
-                value={form.Password}
-                onChange={handleChange}
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('register.password')}</label>
+              <input type="password" name="Password" value={form.Password} onChange={handleChange}
                 className={`input-field ${fieldErrors.Password ? 'input-error' : ''}`}
-                placeholder="Create a password (min 6 chars)"
-              />
-              {fieldErrors.Password && (
-                <p className="mt-1 text-xs text-red-500 dark:text-red-400">{fieldErrors.Password}</p>
-              )}
+                placeholder={t('register.passwordPlaceholder')} />
+              {fieldErrors.Password && <p className="mt-1 text-xs text-red-500 dark:text-red-400">{fieldErrors.Password}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Nickname
-              </label>
-              <input
-                name="Nickname"
-                value={form.Nickname}
-                onChange={handleChange}
-                className="input-field"
-                placeholder="Your display name"
-              />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('register.nickname')}</label>
+              <input name="Nickname" value={form.Nickname} onChange={handleChange} className="input-field" placeholder={t('register.nicknamePlaceholder')} />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                name="Email"
-                value={form.Email}
-                onChange={handleChange}
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('register.email')}</label>
+              <input type="email" name="Email" value={form.Email} onChange={handleChange}
                 className={`input-field ${fieldErrors.Email ? 'input-error' : ''}`}
-                placeholder="your@email.com"
-              />
-              {fieldErrors.Email && (
-                <p className="mt-1 text-xs text-red-500 dark:text-red-400">{fieldErrors.Email}</p>
-              )}
+                placeholder={t('register.emailPlaceholder')} />
+              {fieldErrors.Email && <p className="mt-1 text-xs text-red-500 dark:text-red-400">{fieldErrors.Email}</p>}
             </div>
 
             {errorMsg && (
@@ -148,32 +121,22 @@ export default function Register() {
               </div>
             )}
 
-            <button
-              type="submit"
-              className="w-full btn-primary text-base py-3 mt-2"
-            >
-              Create Account
-            </button>
+            <button type="submit" className="w-full btn-primary text-base py-3 mt-2">{t('register.submit')}</button>
 
             <div className="flex items-center gap-2 pt-2">
               <div className="flex-1 h-px bg-gray-200 dark:bg-dark-600"></div>
-              <span className="text-sm text-gray-500 dark:text-gray-400">or</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{t('common.or')}</span>
               <div className="flex-1 h-px bg-gray-200 dark:bg-dark-600"></div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => navigate('/login')}
-              className="w-full btn-outline text-base py-3"
-            >
-              Already have an account?
+            <button type="button" onClick={() => navigate('/login')} className="w-full btn-outline text-base py-3">
+              {t('register.hasAccount')}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-          © 2024 StudyTracker. All rights reserved.
-        </p>
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">{t('common.copyright')}</p>
+        <LanguageSwitcher />
       </div>
     </div>
   );

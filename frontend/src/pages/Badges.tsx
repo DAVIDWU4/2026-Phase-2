@@ -2,9 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { getAllBadges, getUserUnlockedBadges } from '../api';
 import { useAuthStore } from '../stores/authStore';
 import type { Badge, UserBadge } from '../types';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import { useTranslation, getBadgeLabel } from '../i18n/useTranslation';
+import { useLocaleStore } from '../stores/localeStore';
 
 export default function Badges() {
   const user = useAuthStore(state => state.user);
+  const { t } = useTranslation();
+  const locale = useLocaleStore(s => s.locale);
   const [badges, setBadges] = useState<Badge[]>([]);
   const [userBadges, setUserBadges] = useState<UserBadge[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +23,6 @@ export default function Badges() {
         setLoading(false);
         return;
       }
-
       setLoading(true);
       setError('');
       try {
@@ -30,22 +34,18 @@ export default function Badges() {
         setUserBadges(unlocked);
       } catch (err) {
         console.error('Failed to load badges:', err);
-        setError('Failed to load badges. Please try again.');
+        setError(t('badges.error'));
       } finally {
         setLoading(false);
       }
     };
-
     void load();
-  }, [user?.Id]);
+  }, [user?.Id, t]);
 
   const unlockedBadgeIds = useMemo(
     () => new Set(userBadges.map(ub => ub.BadgeId)),
     [userBadges]
   );
-
-  const unlockedCount = unlockedBadgeIds.size;
-  const totalCount = badges.length;
 
   const getProgress = (badge: Badge) => {
     if (!user) return 0;
@@ -61,14 +61,14 @@ export default function Badges() {
         <div className="flex items-center gap-3">
           <span className="text-3xl">🏅</span>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Badges</h1>
-            <p className="text-gray-500 dark:text-gray-400">Collect achievements and unlock rewards</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('badges.title')}</h1>
+            <p className="text-gray-500 dark:text-gray-400">{t('badges.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
           <span className="text-2xl">🎯</span>
           <span className="font-semibold text-primary-600 dark:text-primary-400">
-            {unlockedCount}/{totalCount} unlocked
+            {t('badges.unlocked', { count: unlockedBadgeIds.size, total: badges.length })}
           </span>
         </div>
       </div>
@@ -82,21 +82,23 @@ export default function Badges() {
       {loading ? (
         <div className="card text-center py-12">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-200 dark:border-primary-800 border-t-primary-600 dark:border-t-primary-400 mb-4" />
-          <p className="text-gray-500 dark:text-gray-400">Loading badges...</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('badges.loading')}</p>
         </div>
       ) : badges.length === 0 ? (
         <div className="card text-center py-12">
           <span className="text-5xl block mb-4">🏆</span>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No badges loaded</h3>
-          <p className="text-gray-500 dark:text-gray-400">Check back later for badge updates</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('badges.emptyTitle')}</h3>
+          <p className="text-gray-500 dark:text-gray-400">{t('badges.emptyDesc')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {badges.map((badge) => {
             const isUnlocked = unlockedBadgeIds.has(badge.Id);
+            const name = getBadgeLabel(locale, badge.Id, 'name', badge.Name);
+            const description = getBadgeLabel(locale, badge.Id, 'desc', badge.Description);
             const progressLabel = badge.RequiredScore > 0
               ? `${user?.TotalScore ?? 0}/${badge.RequiredScore}`
-              : isUnlocked ? 'Unlocked' : 'In progress';
+              : isUnlocked ? t('badges.unlockedLabel') : t('badges.inProgress');
 
             return (
               <div
@@ -109,24 +111,21 @@ export default function Badges() {
                   </div>
                 )}
                 <div className="text-4xl mb-3">{badge.Icon}</div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{badge.Name}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{badge.Description}</p>
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{name}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{description}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {badge.RequiredScore > 0 ? `Required: ${badge.RequiredScore} pts` : 'Special achievement'}
+                    {badge.RequiredScore > 0
+                      ? t('badges.required', { score: badge.RequiredScore })
+                      : t('badges.special')}
                   </span>
                   {!isUnlocked && user && (
-                    <span className="text-xs text-primary-500 dark:text-primary-400">
-                      {progressLabel}
-                    </span>
+                    <span className="text-xs text-primary-500 dark:text-primary-400">{progressLabel}</span>
                   )}
                 </div>
                 {!isUnlocked && (
                   <div className="mt-2 h-1.5 bg-gray-200 dark:bg-dark-600 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary-500 rounded-full transition-all duration-500"
-                      style={{ width: `${getProgress(badge)}%` }}
-                    />
+                    <div className="h-full bg-primary-500 rounded-full transition-all duration-500" style={{ width: `${getProgress(badge)}%` }} />
                   </div>
                 )}
               </div>
@@ -134,6 +133,8 @@ export default function Badges() {
           })}
         </div>
       )}
+
+      <LanguageSwitcher />
     </div>
   );
 }

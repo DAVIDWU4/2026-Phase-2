@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from '../i18n/useTranslation';
 
 type Theme = 'light' | 'dark';
 
 export default function ThemeToggle() {
+  const { t } = useTranslation();
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem('theme');
     return (saved as Theme) || 'light';
@@ -22,7 +24,7 @@ export default function ThemeToggle() {
     <button
       onClick={toggleTheme}
       className="p-2 rounded-lg bg-gray-100 dark:bg-dark-700 hover:bg-gray-200 dark:hover:bg-dark-600 transition-all duration-200"
-      aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+      aria-label={theme === 'light' ? t('theme.switchToDark') : t('theme.switchToLight')}
     >
       {theme === 'light' ? (
         <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

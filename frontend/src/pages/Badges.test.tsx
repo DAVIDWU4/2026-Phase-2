@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { useAuthStore } from '../stores/authStore';
+import { useLocaleStore } from '../stores/localeStore';
 import Badges from './Badges';
 
 vi.mock('../api', () => ({
@@ -31,6 +32,7 @@ const defaultUser = {
 describe('Badges page', () => {
   beforeEach(() => {
     useAuthStore.setState({ user: null, loading: false });
+    useLocaleStore.setState({ locale: 'en' });
   });
 
   it('renders unlocked badge count from API data', async () => {

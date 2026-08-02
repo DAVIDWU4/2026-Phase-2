@@ -2,19 +2,21 @@ import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import ThemeToggle from '../components/ThemeToggle';
-
-const navItems = [
-  { path: '/', label: '🏆 Leaderboard', icon: '🏆' },
-  { path: '/study', label: '📚 学习打卡', icon: '📚' },
-  { path: '/badges', label: '🏅 Badges', icon: '🏅' },
-  { path: '/profile', label: '👤 Profile', icon: '👤' },
-  { path: '/about', label: 'ℹ️ About', icon: 'ℹ️' },
-];
+import { useTranslation } from '../i18n/useTranslation';
 
 export default function MainLayout() {
   const { user, logout } = useAuthStore();
+  const { t } = useTranslation();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { path: '/', label: `🏆 ${t('nav.leaderboard')}` },
+    { path: '/study', label: `📚 ${t('nav.study')}` },
+    { path: '/badges', label: `🏅 ${t('nav.badges')}` },
+    { path: '/profile', label: `👤 ${t('nav.profile')}` },
+    { path: '/about', label: `ℹ️ ${t('nav.about')}` },
+  ];
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -54,19 +56,22 @@ export default function MainLayout() {
                       {(user.Nickname || user.Username)?.charAt(0).toUpperCase() || '?'}
                     </div>
                     <span className="text-sm text-gray-600 dark:text-gray-300">
-                      Hi, <span className="font-semibold text-primary-600 dark:text-primary-400">{user.Nickname || user.Username || 'User'}</span>
+                      {t('nav.hi')}{' '}
+                      <span className="font-semibold text-primary-600 dark:text-primary-400">
+                        {user.Nickname || user.Username || t('common.user')}
+                      </span>
                     </span>
                   </div>
                   <button
                     onClick={() => void logout()}
                     className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 transition-colors"
                   >
-                    Logout
+                    {t('nav.logout')}
                   </button>
                 </div>
               )}
               <ThemeToggle />
-              
+
               <button
                 className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -108,7 +113,7 @@ export default function MainLayout() {
                   }}
                   className="w-full px-4 py-3 text-left font-medium text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg"
                 >
-                  Logout
+                  {t('nav.logout')}
                 </button>
               )}
             </nav>
@@ -119,12 +124,6 @@ export default function MainLayout() {
       <main className="pt-20 pb-10 px-4 sm:px-6 max-w-6xl mx-auto">
         <Outlet />
       </main>
-
-      <footer className="border-t border-gray-200 dark:border-dark-700 py-6 mt-auto">
-        <div className="max-w-6xl mx-auto px-4 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>📚 StudyTracker - Track your learning journey</p>
-        </div>
-      </footer>
     </div>
   );
 }

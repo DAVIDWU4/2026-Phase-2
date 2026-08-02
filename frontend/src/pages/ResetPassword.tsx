@@ -2,9 +2,12 @@ import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { confirmPasswordReset } from '../api'
 import ThemeToggle from '../components/ThemeToggle'
+import LanguageSwitcher from '../components/LanguageSwitcher'
+import { useTranslation } from '../i18n/useTranslation'
 
 export default function ResetPassword() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const initialEmail = searchParams.get('email') ?? ''
   const [email, setEmail] = useState(initialEmail)
@@ -20,17 +23,17 @@ export default function ResetPassword() {
     setStatus('')
 
     if (newPassword !== confirmPassword) {
-      setErrorMsg('Passwords do not match.')
+      setErrorMsg(t('reset.errorMismatch'))
       return
     }
 
     try {
       await confirmPasswordReset({ Email: email, Code: code, NewPassword: newPassword })
-      setStatus('Your password has been reset successfully.')
+      setStatus(t('reset.success'))
       navigate('/login')
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
-      setErrorMsg(message || 'Unable to reset password. Please try again.')
+      setErrorMsg(message || t('reset.errorDefault'))
     }
   }
 
@@ -51,78 +54,46 @@ export default function ResetPassword() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-2xl mb-4">
               <span className="text-3xl">🔐</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Reset Password</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">Enter the code from email and choose a new password.</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('reset.title')}</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">{t('reset.subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input-field"
-                placeholder="your@email.com"
-                required
-              />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('reset.email')}</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                className="input-field" placeholder={t('register.emailPlaceholder')} required />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Verification Code</label>
-              <input
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="input-field"
-                placeholder="Enter 6-digit code"
-                required
-              />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('reset.code')}</label>
+              <input value={code} onChange={(e) => setCode(e.target.value)}
+                className="input-field" placeholder={t('reset.codePlaceholder')} required />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">New Password</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="input-field"
-                placeholder="New password"
-                required
-              />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('reset.newPassword')}</label>
+              <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
+                className="input-field" placeholder={t('reset.newPasswordPlaceholder')} required />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Confirm Password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="input-field"
-                placeholder="Confirm new password"
-                required
-              />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('reset.confirmPassword')}</label>
+              <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                className="input-field" placeholder={t('reset.confirmPasswordPlaceholder')} required />
             </div>
 
-            {errorMsg && (
-              <div className="text-sm text-red-500 dark:text-red-400">{errorMsg}</div>
-            )}
-            {status && (
-              <div className="text-sm text-green-600 dark:text-green-400">{status}</div>
-            )}
+            {errorMsg && <div className="text-sm text-red-500 dark:text-red-400">{errorMsg}</div>}
+            {status && <div className="text-sm text-green-600 dark:text-green-400">{status}</div>}
 
-            <button type="submit" className="w-full btn-primary text-base py-3">
-              Reset Password
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigate('/login')}
-              className="w-full btn-outline text-base py-3"
-            >
-              Back to Login
+            <button type="submit" className="w-full btn-primary text-base py-3">{t('reset.submit')}</button>
+            <button type="button" onClick={() => navigate('/login')} className="w-full btn-outline text-base py-3">
+              {t('reset.backLogin')}
             </button>
           </form>
         </div>
+
+        <LanguageSwitcher />
       </div>
     </div>
   )

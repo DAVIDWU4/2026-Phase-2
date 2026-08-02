@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { getLeaderboard } from '../api';
 import { useAuthStore } from '../stores/authStore';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface LeaderboardEntry {
   UserId: number;
@@ -14,25 +16,24 @@ interface LeaderboardEntry {
 
 export default function Leaderboard() {
   const user = useAuthStore(state => state.user);
+  const { t } = useTranslation();
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [error, setError] = useState('');
+  const [loadFailed, setLoadFailed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Get leaderboard sorted by total score
   useEffect(() => {
     const fetchLeaderboard = async () => {
       setIsLoading(true);
       try {
         const data = await getLeaderboard();
         setLeaderboard(data);
-        setError('');
+        setLoadFailed(false);
       } catch {
-        setError('Could not reach the backend. Is it running on port 5000?');
+        setLoadFailed(true);
       } finally {
         setIsLoading(false);
       }
     };
-
     void fetchLeaderboard();
   }, []);
 
@@ -57,14 +58,12 @@ export default function Leaderboard() {
     return 'text-gray-700 dark:text-gray-300';
   };
 
-  // Compute current user rank
-  const getUserRank = () => {
-    if (!user) return null;
-    const userEntryIndex = leaderboard.findIndex(entry => entry.UserId === user.Id);
-    return userEntryIndex >= 0 ? userEntryIndex + 1 : null;
-  };
-
-  const userRank = getUserRank();
+  const userRank = user
+    ? (() => {
+        const idx = leaderboard.findIndex(entry => entry.UserId === user.Id);
+        return idx >= 0 ? idx + 1 : null;
+      })()
+    : null;
 
   return (
     <div className="animate-fade-in">
@@ -72,13 +71,13 @@ export default function Leaderboard() {
         <div className="flex items-center gap-3">
           <span className="text-3xl">🏆</span>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Score Leaderboard</h1>
-            <p className="text-gray-500 dark:text-gray-400">Track your progress and compete with others</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('leaderboard.title')}</h1>
+            <p className="text-gray-500 dark:text-gray-400">{t('leaderboard.subtitle')}</p>
           </div>
         </div>
         {user && userRank && (
           <div className="flex items-center gap-2 px-4 py-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-            <span className="text-primary-600 dark:text-primary-400">Your Rank:</span>
+            <span className="text-primary-600 dark:text-primary-400">{t('leaderboard.yourRank')}</span>
             <span className="text-xl font-bold text-primary-700 dark:text-primary-300">
               {userRank === 1 ? '🥇' : userRank === 2 ? '🥈' : userRank === 3 ? '🥉' : `#${userRank}`}
             </span>
@@ -86,31 +85,27 @@ export default function Leaderboard() {
         )}
       </div>
 
-      {error && (
+      {loadFailed && (
         <div className="flex items-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 mb-6">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
-          {error}
+          {t('leaderboard.error')}
         </div>
       )}
 
       {isLoading && leaderboard.length === 0 ? (
         <div className="card text-center py-12">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-200 dark:border-primary-800 border-t-primary-600 dark:border-t-primary-400 mb-4"></div>
-          <p className="text-gray-500 dark:text-gray-400">Loading leaderboard...</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('leaderboard.loading')}</p>
         </div>
       ) : leaderboard.length === 0 ? (
         <div className="card text-center py-12">
           <span className="text-5xl block mb-4">📊</span>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No users yet</h3>
-          <p className="text-gray-500 dark:text-gray-400">Be the first to start studying!</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('leaderboard.emptyTitle')}</h3>
+          <p className="text-gray-500 dark:text-gray-400">{t('leaderboard.emptyDesc')}</p>
         </div>
       ) : (
         <div className="space-y-3">
           {leaderboard.map((entry, index) => {
             const isCurrentUser = user?.Id === entry.UserId;
-            
             return (
               <div
                 key={entry.UserId}
@@ -126,20 +121,22 @@ export default function Leaderboard() {
                       <div className="font-semibold text-gray-900 dark:text-gray-100">
                         {entry.Nickname || entry.Username}
                         {isCurrentUser && (
-                          <span className="ml-2 px-2 py-0.5 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full">You</span>
+                          <span className="ml-2 px-2 py-0.5 text-xs bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full">
+                            {t('common.you')}
+                          </span>
                         )}
                       </div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Level {entry.Level} | {entry.StreakDays} day streak
+                        {t('common.level')} {entry.Level} | {t('leaderboard.streak', { days: entry.StreakDays })}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className={`text-2xl font-bold ${getRankTextColor(index)}`}>
-                      {entry.Amount} pts
+                      {entry.Amount} {t('common.pts')}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {entry.Reason}
+                      {t('leaderboard.totalScore')}
                     </div>
                   </div>
                 </div>
@@ -148,6 +145,8 @@ export default function Leaderboard() {
           })}
         </div>
       )}
+
+      <LanguageSwitcher />
     </div>
   );
 }

@@ -2,9 +2,12 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { requestPasswordReset } from '../api'
 import ThemeToggle from '../components/ThemeToggle'
+import LanguageSwitcher from '../components/LanguageSwitcher'
+import { useTranslation } from '../i18n/useTranslation'
 
 export default function ForgotPassword() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
@@ -16,11 +19,11 @@ export default function ForgotPassword() {
 
     try {
       await requestPasswordReset({ Email: email })
-      setStatus('If the email exists, a reset code has been sent. Check the app logs or your inbox.')
+      setStatus(t('forgot.success'))
       navigate(`/reset-password?email=${encodeURIComponent(email)}`)
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
-      setErrorMsg(message || 'Unable to send reset code. Please try again.')
+      setErrorMsg(message || t('forgot.errorDefault'))
     }
   }
 
@@ -41,43 +44,28 @@ export default function ForgotPassword() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-2xl mb-4">
               <span className="text-3xl">✉️</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Forgot Password</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">Enter your email and we will send you a verification code.</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('forgot.title')}</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">{t('forgot.subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input-field"
-                placeholder="your@email.com"
-                required
-              />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('forgot.email')}</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                className="input-field" placeholder={t('register.emailPlaceholder')} required />
             </div>
 
-            {errorMsg && (
-              <div className="text-sm text-red-500 dark:text-red-400">{errorMsg}</div>
-            )}
-            {status && (
-              <div className="text-sm text-green-600 dark:text-green-400">{status}</div>
-            )}
+            {errorMsg && <div className="text-sm text-red-500 dark:text-red-400">{errorMsg}</div>}
+            {status && <div className="text-sm text-green-600 dark:text-green-400">{status}</div>}
 
-            <button type="submit" className="w-full btn-primary text-base py-3">
-              Send Reset Code
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigate('/login')}
-              className="w-full btn-outline text-base py-3"
-            >
-              Back to Login
+            <button type="submit" className="w-full btn-primary text-base py-3">{t('forgot.submit')}</button>
+            <button type="button" onClick={() => navigate('/login')} className="w-full btn-outline text-base py-3">
+              {t('forgot.backLogin')}
             </button>
           </form>
         </div>
+
+        <LanguageSwitcher />
       </div>
     </div>
   )

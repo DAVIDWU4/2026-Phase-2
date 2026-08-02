@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import ThemeToggle from '../components/ThemeToggle';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import { useTranslation } from '../i18n/useTranslation';
 
 export default function Login() {
   const navigate = useNavigate();
   const authenticate = useAuthStore(s => s.authenticate);
+  const { t } = useTranslation();
 
   const [form, setForm] = useState<{ Username: string; Password: string }>({
     Username: '',
@@ -28,7 +31,7 @@ export default function Login() {
       navigate('/');
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      setErrorMsg(message || 'Username or password is incorrect');
+      setErrorMsg(message || t('login.errorDefault'));
       setHasFieldError(true);
     }
   };
@@ -50,27 +53,27 @@ export default function Login() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-2xl mb-4">
               <span className="text-3xl">📖</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Welcome Back</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">Sign in to continue your learning journey</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('login.title')}</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">{t('login.subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Username
+                {t('login.username')}
               </label>
               <input
                 name="Username"
                 value={form.Username}
                 onChange={handleChange}
                 className={`input-field ${hasFieldError ? 'input-error' : ''}`}
-                placeholder="Enter your username"
+                placeholder={t('login.usernamePlaceholder')}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Password
+                {t('login.password')}
               </label>
               <input
                 type="password"
@@ -78,7 +81,7 @@ export default function Login() {
                 value={form.Password}
                 onChange={handleChange}
                 className={`input-field ${hasFieldError ? 'input-error' : ''}`}
-                placeholder="Enter your password"
+                placeholder={t('login.passwordPlaceholder')}
               />
             </div>
 
@@ -91,40 +94,30 @@ export default function Login() {
               </div>
             )}
 
-            <button
-              type="submit"
-              className="w-full btn-primary text-base py-3"
-            >
-              Sign In
+            <button type="submit" className="w-full btn-primary text-base py-3">
+              {t('login.submit')}
             </button>
 
             <div className="flex items-center gap-2 pt-2">
               <div className="flex-1 h-px bg-gray-200 dark:bg-dark-600"></div>
-              <span className="text-sm text-gray-500 dark:text-gray-400">or</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{t('common.or')}</span>
               <div className="flex-1 h-px bg-gray-200 dark:bg-dark-600"></div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => navigate('/register')}
-              className="w-full btn-outline text-base py-3"
-            >
-              Create New Account
+            <button type="button" onClick={() => navigate('/register')} className="w-full btn-outline text-base py-3">
+              {t('login.createAccount')}
             </button>
 
-            <button
-              type="button"
-              onClick={() => navigate('/forgot-password')}
-              className="w-full btn-secondary text-base py-3"
-            >
-              Forgot password?
+            <button type="button" onClick={() => navigate('/forgot-password')} className="w-full btn-secondary text-base py-3">
+              {t('login.forgotPassword')}
             </button>
           </form>
         </div>
 
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-          © 2024 StudyTracker. All rights reserved.
+          {t('common.copyright')}
         </p>
+        <LanguageSwitcher />
       </div>
     </div>
   );
