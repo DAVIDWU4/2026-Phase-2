@@ -104,15 +104,35 @@ if (allowedOrigins.Count <= 2) // only localhost defaults
     Console.WriteLine("[CORS] WARNING: Only localhost origins configured. Set AllowedOrigins env var for production.");
 }
 
+static bool IsAllowedOrigin(string origin, IReadOnlyCollection<string> configuredOrigins)
+{
+    if (configuredOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase))
+        return true;
+
+    if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+        return false;
+
+    // Allow Vercel production + preview deployment URLs (e.g. project-hash-team-projects.vercel.app)
+    if (uri.Scheme == Uri.UriSchemeHttps
+        && uri.Host.EndsWith(".vercel.app", StringComparison.OrdinalIgnoreCase))
+    {
+        return true;
+    }
+
+    return uri.Scheme == Uri.UriSchemeHttp
+        && (uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase)
+            || uri.Host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase));
+}
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(allowedOrigins.ToArray())
+        policy.SetIsOriginAllowed(origin => IsAllowedOrigin(origin, allowedOrigins))
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials()
-              .SetPreflightMaxAge(TimeSpan.FromHours(1));
+              .SetPreflightMaxAge(TimeSpan.FromMinutes(5));
     });
 });
 
