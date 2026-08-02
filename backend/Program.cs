@@ -27,16 +27,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
-// Disable appsettings hot-reload in production; keep it in development for debugging
-if (!builder.Environment.IsDevelopment())
-{
-    builder.Configuration.Sources.OfType<IConfigurationSource>()
-        .Where(s => s is FileConfigurationSource)
-        .Cast<FileConfigurationSource>()
-        .ToList()
-        .ForEach(src => src.ReloadOnChange = false);
-}
-
 // Validate database connection string
 var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrEmpty(connStr))
@@ -101,7 +91,8 @@ builder.Services.AddScoped<StudyGameService>();
 
 // Postgres database context
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connStr));
+    options.UseNpgsql(connStr, npgsql =>
+        npgsql.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null)));
 
 // Global cookie policy: compatible with Vercel <-> Render cross-domain
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -181,14 +172,23 @@ if (app.Environment.IsDevelopment())
 }
 
 // Auto-run database migrations on startup (controlled by env var, default: enabled)
-// Set AutoMigrate=false to disable (e.g. if you run migrations manually via CI)
 var autoMigrate = app.Configuration["AutoMigrate"] ?? "true";
 if (autoMigrate.Equals("true", StringComparison.OrdinalIgnoreCase))
 {
-    using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
-    Console.WriteLine("[DB] Database migrations applied successfully.");
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        dbContext.Database.Migrate();
+        Console.WriteLine("[DB] Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[DB] FATAL: Migration failed: {ex.Message}");
+        Console.WriteLine(ex.ToString());
+        throw;
+    }
 }
 
+Console.WriteLine("[Startup] Application ready.");
 app.Run();

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "d5GsIVNhcr0=",
+  "dgSpecHash": "IJsTlV4LgFo=",
   "success": true,
   "projectFilePath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
   "expectedPackageFiles": [
@@ -31,7 +31,6 @@
     "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget\\npgsql.entityframeworkcore.postgresql\\10.0.3\\npgsql.entityframeworkcore.postgresql.10.0.3.nupkg.sha512",
     "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget\\scalar.aspnetcore\\2.16.16\\scalar.aspnetcore.2.16.16.nupkg.sha512",
     "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget\\sendgrid\\9.29.3\\sendgrid.9.29.3.nupkg.sha512",
-    "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget\\sqlitepclraw.lib.e_sqlite3\\3.50.3\\sqlitepclraw.lib.e_sqlite3.3.50.3.nupkg.sha512",
     "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget\\starkbank-ecdsa\\1.3.3\\starkbank-ecdsa.1.3.3.nupkg.sha512",
     "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget\\xunit\\2.9.3\\xunit.2.9.3.nupkg.sha512",
     "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget\\xunit.abstractions\\2.0.3\\xunit.abstractions.2.0.3.nupkg.sha512",
@@ -43,18 +42,6 @@
     "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget\\xunit.runner.visualstudio\\3.1.4\\xunit.runner.visualstudio.3.1.4.nupkg.sha512"
   ],
   "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "message": "backend 依赖于 SQLitePCLRaw.lib.e_sqlite3 (>= 2.1.15)，但没有找到 SQLitePCLRaw.lib.e_sqlite3 2.1.15。已改为解析 SQLitePCLRaw.lib.e_sqlite3 3.50.3。",
-      "projectPath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
-      "libraryId": "SQLitePCLRaw.lib.e_sqlite3",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
     {
       "code": "NU1903",
       "level": "Warning",

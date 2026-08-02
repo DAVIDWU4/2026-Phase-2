@@ -1,1 +1,5 @@
-appsettings.json
+# Keep appsettings.json in the image; exclude local/dev overrides and secrets only
+appsettings.Development.json
+appsettings.Local.json
+.env
+.env.*
