@@ -90,7 +90,10 @@ export default function Study() {
     return `${minutes}m`;
   };
 
-  const getSubjectInfo = (subjectId: string) => {
+  const getSubjectInfo = (subjectId: string | undefined) => {
+    if (!subjectId) {
+      return { id: 'unknown', name: 'Unknown', icon: '📚', color: 'bg-gray-500' };
+    }
     return subjects.find(s => s.id === subjectId) || { id: subjectId, name: subjectId.charAt(0).toUpperCase() + subjectId.slice(1), icon: '📚', color: 'bg-gray-500' };
   };
 

@@ -6,6 +6,38 @@ import type {
 
 const API_ROOT = import.meta.env.VITE_API_ROOT ?? 'http://localhost:5000/api'
 
+const toNumber = (value: unknown, fallback: number): number => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : fallback
+  }
+  return fallback
+}
+
+const toString = (value: unknown, fallback: string): string => {
+  return typeof value === 'string' ? value : fallback
+}
+
+const toNullableString = (value: unknown): string | null => {
+  return typeof value === 'string' ? value : null
+}
+
+function normalizeStudyRecord(data: unknown): StudyRecord {
+  const raw = typeof data === 'object' && data !== null ? data as Record<string, unknown> : {}
+
+  return {
+    Id: toNumber(raw.Id ?? raw.id, 0),
+    UserId: toNumber(raw.UserId ?? raw.userId, 0),
+    StudyDate: toString(raw.StudyDate ?? raw.studyDate, new Date().toISOString()),
+    DurationMinutes: toNumber(raw.DurationMinutes ?? raw.durationMinutes, 0),
+    Subject: toString(raw.Subject ?? raw.subject, ''),
+    EarnedScore: toNumber(raw.EarnedScore ?? raw.earnedScore, 0),
+    StreakCount: toNumber(raw.StreakCount ?? raw.streakCount, 0),
+    Notes: toNullableString(raw.Notes ?? raw.notes),
+  }
+}
+
 // General fetch wrapper for headers and error handling.
 async function apiFetch<T>(url: string, init?: RequestInit): Promise<T | undefined> {
   const fullUrl = `${API_ROOT}${url}`
@@ -117,14 +149,16 @@ export async function confirmPasswordReset(data: PasswordResetConfirmRequest): P
 
 // ========== StudyRecord ==========
 export async function getStudyRecords(userId: number): Promise<StudyRecord[]> {
-  return (await apiFetch(`/StudyRecords/user/${userId}`)) ?? []
+  const data = (await apiFetch<unknown[]>(`/StudyRecords/user/${userId}`)) ?? []
+  return data.map(normalizeStudyRecord)
 }
 
 export async function createStudyRecord(record: NewStudyRecord): Promise<StudyRecord> {
-  return await apiFetch('/StudyRecords', {
+  const data = await apiFetch('/StudyRecords', {
     method: 'POST',
     body: JSON.stringify(record)
-  }) as StudyRecord
+  })
+  return normalizeStudyRecord(data)
 }
 
 export async function updateStudyRecord(id: number, record: Partial<StudyRecord>): Promise<StudyRecord> {
