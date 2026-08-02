@@ -34,5 +34,5 @@ public class StudyRecord
 
     [MaxLength(500)]
     [Column("notes")]
-    public string? Notes { get; set; }
+    public string? Notes { get; set; } = "";
 }

@@ -40,7 +40,7 @@ export default function Study() {
       Subject: selectedSubject,
       EarnedScore: 0,
       StreakCount: 0,
-      Notes: notes || null
+      Notes: notes ?? ""
     });
     setMessage('✅ Study session logged successfully!');
     setMessageType('success');
