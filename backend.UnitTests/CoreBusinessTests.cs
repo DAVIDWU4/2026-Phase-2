@@ -2,6 +2,8 @@ using backend.Data;
 using backend.Models;
 using backend.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace backend.UnitTests;
 
@@ -350,5 +352,127 @@ public class CoreBusinessTests
             .FirstOrDefaultAsync(ub => ub.UserId == user.Id && ub.BadgeId == badge.Id);
         
         Assert.Null(deletedCheck);
+    }
+
+    [Fact]
+    public async Task CheckinRecord_DoesNotUnlockSpecialBadges()
+    {
+        using var db = TestDbFactory.CreateCleanDbContext();
+        var service = new StudyGameService(db);
+
+        var user = new User
+        {
+            Username = "CheckinUser",
+            Email = "checkin@test.com",
+            PasswordHash = "hash",
+            TotalScore = 0
+        };
+        db.Users.Add(user);
+        await db.SaveChangesAsync();
+
+        await service.SubmitStudyRecordAsync(new StudyRecord
+        {
+            UserId = user.Id,
+            Subject = "Math",
+            StudyDate = DateTime.UtcNow,
+            DurationMinutes = 1,
+            Notes = StudyGameService.CheckinNote
+        });
+
+        var unlocked = await db.UserBadges.Where(ub => ub.UserId == user.Id).ToListAsync();
+        Assert.Empty(unlocked);
+    }
+
+    [Fact]
+    public async Task ThirtyMinutes_DoesNotUnlockHourStarterBadge()
+    {
+        using var db = TestDbFactory.CreateCleanDbContext();
+        var service = new StudyGameService(db);
+
+        var user = new User
+        {
+            Username = "TimeUser",
+            Email = "time@test.com",
+            PasswordHash = "hash",
+            TotalScore = 0
+        };
+        db.Users.Add(user);
+        await db.SaveChangesAsync();
+
+        await service.SubmitStudyRecordAsync(new StudyRecord
+        {
+            UserId = user.Id,
+            Subject = "Physics",
+            StudyDate = DateTime.UtcNow,
+            DurationMinutes = 30
+        });
+
+        var hourBadge = await db.Badges.FirstAsync(b => b.Id == 10);
+        var hasHourBadge = await db.UserBadges
+            .AnyAsync(ub => ub.UserId == user.Id && ub.BadgeId == hourBadge.Id);
+        Assert.False(hasHourBadge);
+    }
+
+    [Fact]
+    public async Task DeleteStudyRecord_RevokesScoreBadge()
+    {
+        using var db = TestDbFactory.CreateCleanDbContext();
+        var service = new StudyGameService(db);
+
+        var user = new User
+        {
+            Username = "RevokeUser",
+            Email = "revoke@test.com",
+            PasswordHash = "hash",
+            TotalScore = 96
+        };
+        db.Users.Add(user);
+        await db.SaveChangesAsync();
+
+        var record = await service.SubmitStudyRecordAsync(new StudyRecord
+        {
+            UserId = user.Id,
+            Subject = "Revoke Test",
+            StudyDate = DateTime.UtcNow,
+            DurationMinutes = 40
+        });
+
+        var risingStar = await db.Badges.FirstAsync(b => b.Name == "Rising Star");
+        Assert.True(await db.UserBadges.AnyAsync(ub => ub.UserId == user.Id && ub.BadgeId == risingStar.Id));
+
+        await service.DeleteStudyRecordAsync(record.Id);
+
+        Assert.False(await db.UserBadges.AnyAsync(ub => ub.UserId == user.Id && ub.BadgeId == risingStar.Id));
+        var updatedUser = await db.Users.FindAsync(user.Id);
+        Assert.Equal(96, updatedUser!.TotalScore);
+    }
+
+    [Fact]
+    public async Task PasswordResetToken_ValidateAndConsume()
+    {
+        using var db = TestDbFactory.CreateCleanDbContext();
+        var service = new PasswordResetService(db, new ConfigurationBuilder().Build(), new TestHostEnvironment());
+
+        db.PasswordResetTokens.Add(new PasswordResetToken
+        {
+            Email = "user@test.com",
+            Code = "654321",
+            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+            CreatedAt = DateTime.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var valid = await service.ValidateResetCodeAsync("user@test.com", "654321");
+        Assert.True(valid);
+        Assert.Empty(await db.PasswordResetTokens.ToListAsync());
+    }
+
+    private sealed class TestHostEnvironment : Microsoft.Extensions.Hosting.IHostEnvironment
+    {
+        public string EnvironmentName { get; set; } = Environments.Development;
+        public string ApplicationName { get; set; } = "Test";
+        public string ContentRootPath { get; set; } = Directory.GetCurrentDirectory();
+        public Microsoft.Extensions.FileProviders.IFileProvider ContentRootFileProvider { get; set; }
+            = new Microsoft.Extensions.FileProviders.NullFileProvider();
     }
 }

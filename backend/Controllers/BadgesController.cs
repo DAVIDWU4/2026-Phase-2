@@ -1,7 +1,10 @@
 using backend.Data;
 using backend.Models;
+using backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace backend.Controllers;
 
@@ -10,20 +13,20 @@ namespace backend.Controllers;
 public class BadgesController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly StudyGameService _studyGameService;
 
-    public BadgesController(AppDbContext context)
+    public BadgesController(AppDbContext context, StudyGameService studyGameService)
     {
         _context = context;
+        _studyGameService = studyGameService;
     }
 
-    // get all badges
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Badge>>> GetBadges()
     {
         return await _context.Badges.ToListAsync();
     }
 
-    // get a single badge
     [HttpGet("{id}")]
     public async Task<ActionResult<Badge>> GetBadge(int id)
     {
@@ -32,18 +35,23 @@ public class BadgesController : ControllerBase
         return badge;
     }
 
-
-    // get badges unlocked by user
+    [Authorize]
     [HttpGet("user/{userId}")]
     public async Task<ActionResult<IEnumerable<UserBadge>>> GetUserBadges(int userId)
     {
-       var userBadges = await _context.UserBadges
+        var currentUserId = GetCurrentUserId();
+        if (currentUserId is null || currentUserId.Value != userId)
+            return Forbid();
+
+        await _studyGameService.ReconcileUserBadgesAsync(userId);
+        await _context.SaveChangesAsync();
+
+        var userBadges = await _context.UserBadges
             .Where(ub => ub.UserId == userId)
             .ToListAsync();
         return Ok(userBadges);
     }
 
-    // create a new badge
     [HttpPost]
     public async Task<ActionResult<Badge>> PostBadge(Badge badge)
     {
@@ -52,7 +60,6 @@ public class BadgesController : ControllerBase
         return CreatedAtAction(nameof(GetBadge), new { id = badge.Id }, badge);
     }
 
-    // update a badge
     [HttpPut("{id}")]
     public async Task<IActionResult> PutBadge(int id, Badge badge)
     {
@@ -71,7 +78,6 @@ public class BadgesController : ControllerBase
         return NoContent();
     }
 
-    // delete a badge
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBadge(int id)
     {
@@ -81,6 +87,12 @@ public class BadgesController : ControllerBase
         _context.Badges.Remove(badge);
         await _context.SaveChangesAsync();
         return NoContent();
+    }
+
+    private int? GetCurrentUserId()
+    {
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(idClaim, out var id) ? id : null;
     }
 
     private bool BadgeExists(int id)

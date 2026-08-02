@@ -11,11 +11,13 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus('')
     setErrorMsg('')
+    setSubmitting(true)
 
     try {
       await requestPasswordReset({ Email: email })
@@ -24,6 +26,8 @@ export default function ForgotPassword() {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       setErrorMsg(message || t('forgot.errorDefault'))
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -51,14 +55,23 @@ export default function ForgotPassword() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('forgot.email')}</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                className="input-field" placeholder={t('register.emailPlaceholder')} required />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input-field"
+                placeholder={t('register.emailPlaceholder')}
+                required
+                disabled={submitting}
+              />
             </div>
 
             {errorMsg && <div className="text-sm text-red-500 dark:text-red-400">{errorMsg}</div>}
             {status && <div className="text-sm text-green-600 dark:text-green-400">{status}</div>}
 
-            <button type="submit" className="w-full btn-primary text-base py-3">{t('forgot.submit')}</button>
+            <button type="submit" disabled={submitting} className="w-full btn-primary text-base py-3 disabled:opacity-60">
+              {submitting ? t('forgot.sending') : t('forgot.submit')}
+            </button>
             <button type="button" onClick={() => navigate('/login')} className="w-full btn-outline text-base py-3">
               {t('forgot.backLogin')}
             </button>

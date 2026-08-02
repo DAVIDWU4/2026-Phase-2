@@ -8,6 +8,7 @@ import { useLocaleStore } from '../stores/localeStore';
 
 export default function Badges() {
   const user = useAuthStore(state => state.user);
+  const refreshUser = useAuthStore(state => state.refreshUser);
   const { t } = useTranslation();
   const locale = useLocaleStore(s => s.locale);
   const [badges, setBadges] = useState<Badge[]>([]);
@@ -26,9 +27,13 @@ export default function Badges() {
       setLoading(true);
       setError('');
       try {
+        await refreshUser();
+        const currentUser = useAuthStore.getState().user;
+        if (!currentUser?.Id) return;
+
         const [allBadges, unlocked] = await Promise.all([
           getAllBadges(),
-          getUserUnlockedBadges(user.Id),
+          getUserUnlockedBadges(currentUser.Id),
         ]);
         setBadges(allBadges.filter(b => b.Id > 0).sort((a, b) => a.Id - b.Id));
         setUserBadges(unlocked.filter(ub => ub.BadgeId > 0));
@@ -40,7 +45,7 @@ export default function Badges() {
       }
     };
     void load();
-  }, [user?.Id, t]);
+  }, [user?.Id, user?.TotalScore, refreshUser, t]);
 
   const unlockedBadgeIds = useMemo(
     () => new Set(userBadges.map(ub => ub.BadgeId)),
@@ -93,7 +98,9 @@ export default function Badges() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {badges.map((badge) => {
-            const isUnlocked = unlockedBadgeIds.has(badge.Id);
+            const isUnlocked = badge.RequiredScore > 0
+              ? (user?.TotalScore ?? 0) >= badge.RequiredScore
+              : unlockedBadgeIds.has(badge.Id);
             const name = getBadgeLabel(locale, badge.Id, 'name', badge.Name);
             const description = getBadgeLabel(locale, badge.Id, 'desc', badge.Description);
             const progressLabel = badge.RequiredScore > 0

@@ -12,9 +12,13 @@ public class AppDbContext : DbContext
     public DbSet<Badge> Badges { get; set; }
     public DbSet<StudyRecord> StudyRecords { get; set; }
     public DbSet<UserBadge> UserBadges { get; set; }
+    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<PasswordResetToken>()
+            .HasIndex(t => t.Email)
+            .IsUnique();
         modelBuilder.Entity<UserBadge>()
             .HasKey(ub => new { ub.UserId, ub.BadgeId });
 

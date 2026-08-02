@@ -234,14 +234,10 @@ public class UsersController : ControllerBase
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
         if (user != null)
         {
-            var code = _passwordResetService.CreateResetCode(dto.Email);
-            try
+            var (sent, error) = await _passwordResetService.TrySendResetCodeAsync(dto.Email);
+            if (!sent)
             {
-                await _passwordResetService.SendResetMailAsync(dto.Email, code);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to send password reset email to {dto.Email}: {ex.Message}");
+                return StatusCode(503, new { Message = error ?? "Unable to send verification code. Please try again later." });
             }
         }
 
@@ -251,7 +247,7 @@ public class UsersController : ControllerBase
     [HttpPost("password-reset-confirm")]
     public async Task<IActionResult> ConfirmPasswordReset(PasswordResetConfirmDto dto)
     {
-        if (!_passwordResetService.ValidateResetCode(dto.Email, dto.Code))
+        if (!await _passwordResetService.ValidateResetCodeAsync(dto.Email, dto.Code))
         {
             return BadRequest("Invalid or expired reset code.");
         }

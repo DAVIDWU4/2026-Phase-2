@@ -74,6 +74,8 @@ async function apiFetch<T>(url: string, init?: RequestInit): Promise<T | undefin
           if (firstMsg) errMsg = firstMsg
         } else if (parsed.message) {
           errMsg = parsed.message
+        } else if (parsed.Message) {
+          errMsg = parsed.Message
         } else if (typeof parsed === 'string') {
           errMsg = parsed
         }
