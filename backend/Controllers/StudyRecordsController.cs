@@ -1,3 +1,4 @@
+using backend.Dtos;
 using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,19 @@ public class StudyRecordsController(StudyGameService studyGameService) : Control
     private readonly StudyGameService _studyGameService = studyGameService;
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] StudyRecord record)
+    public async Task<IActionResult> Create([FromBody] CreateStudyRecordDto dto)
     {
         try
         {
+            var record = new StudyRecord
+            {
+                UserId = dto.UserId,
+                StudyDate = dto.StudyDate,
+                DurationMinutes = dto.DurationMinutes,
+                Subject = dto.Subject,
+                Notes = dto.Notes
+            };
+
             var savedRecord = await _studyGameService.SubmitStudyRecordAsync(record);
             return CreatedAtAction(nameof(GetById), new { id = savedRecord.Id }, savedRecord);
         }
