@@ -2,13 +2,16 @@ import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import ThemeToggle from '../components/ThemeToggle';
+import ProfileModal from '../components/ProfileModal';
 import { useTranslation } from '../i18n/useTranslation';
+import { getAvatarGradient, getDisplayInitial } from '../utils/normalize';
 
 export default function MainLayout() {
   const { user, logout } = useAuthStore();
   const { t } = useTranslation();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileUserId, setProfileUserId] = useState<number | null>(null);
 
   const navItems = [
     { path: '/', label: `🏆 ${t('nav.leaderboard')}` },
@@ -22,6 +25,7 @@ export default function MainLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-900">
+      <ProfileModal userId={profileUserId} onClose={() => setProfileUserId(null)} />
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-dark-800/80 backdrop-blur-lg border-b border-gray-200 dark:border-dark-700">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
@@ -52,9 +56,14 @@ export default function MainLayout() {
               {user && (
                 <div className="hidden md:flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-sm font-bold">
-                      {(user.Nickname || user.Username)?.charAt(0).toUpperCase() || '?'}
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setProfileUserId(user.Id)}
+                      title={t('profile.title')}
+                      className={`w-8 h-8 rounded-full bg-gradient-to-br ${getAvatarGradient(user.Username || 'user')} flex items-center justify-center text-white text-sm font-bold hover:ring-2 hover:ring-primary-400 transition-all cursor-pointer`}
+                    >
+                      {getDisplayInitial(user.Nickname, user.Username)}
+                    </button>
                     <span className="text-sm text-gray-600 dark:text-gray-300">
                       {t('nav.hi')}{' '}
                       <span className="font-semibold text-primary-600 dark:text-primary-400">

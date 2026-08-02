@@ -30,8 +30,8 @@ export default function Badges() {
           getAllBadges(),
           getUserUnlockedBadges(user.Id),
         ]);
-        setBadges(allBadges);
-        setUserBadges(unlocked);
+        setBadges(allBadges.filter(b => b.Id > 0).sort((a, b) => a.Id - b.Id));
+        setUserBadges(unlocked.filter(ub => ub.BadgeId > 0));
       } catch (err) {
         console.error('Failed to load badges:', err);
         setError(t('badges.error'));
@@ -103,16 +103,20 @@ export default function Badges() {
             return (
               <div
                 key={badge.Id}
-                className={`badge-item ${isUnlocked ? 'badge-unlocked' : 'badge-locked'} relative overflow-hidden`}
+                className={`badge-item ${isUnlocked ? 'badge-unlocked' : 'badge-locked'} relative overflow-hidden p-4`}
               >
                 {isUnlocked && (
-                  <div className="absolute top-2 right-2">
-                    <span className="px-2 py-1 bg-green-500 text-white text-xs rounded-full">✅</span>
+                  <div className="absolute top-2 right-2 z-10">
+                    <span className="px-2 py-0.5 bg-green-500 text-white text-xs rounded-full">✅</span>
                   </div>
                 )}
-                <div className="text-4xl mb-3">{badge.Icon}</div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{name}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{description}</p>
+                <div className={`text-4xl mb-3 ${isUnlocked ? '' : 'opacity-70'}`}>{badge.Icon || '🏅'}</div>
+                <h3 className={`font-semibold mb-1 ${isUnlocked ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-300'}`}>
+                  {name || badge.Name || `#${badge.Id}`}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">
+                  {description || badge.Description || '—'}
+                </p>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-400 dark:text-gray-500">
                     {badge.RequiredScore > 0

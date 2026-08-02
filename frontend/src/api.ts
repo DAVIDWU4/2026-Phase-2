@@ -3,6 +3,15 @@ import type {
   RegisterRequest, PasswordResetRequest, PasswordResetConfirmRequest,
   NewScoreEntry, NewStudyRecord, UserBadge
 } from './types'
+import {
+  normalizeUser,
+  normalizeBadge,
+  normalizeUserBadge,
+  normalizeLeaderboardEntry,
+  type LeaderboardEntry,
+} from './utils/normalize'
+
+export type { LeaderboardEntry }
 
 const API_ROOT = import.meta.env.VITE_API_ROOT ?? 'http://localhost:5000/api'
 
@@ -88,16 +97,9 @@ export async function getScores(): Promise<ScoreEntry[]> {
 }
 
 // Get leaderboard sorted by total score.
-export async function getLeaderboard(): Promise<{
-  UserId: number;
-  Amount: number;
-  Reason: string;
-  Username: string;
-  Nickname: string;
-  Level: number;
-  StreakDays: number;
-}[]> {
-  return (await apiFetch('/scores/leaderboard')) ?? []
+export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
+  const data = (await apiFetch<unknown[]>('/scores/leaderboard')) ?? []
+  return data.map(normalizeLeaderboardEntry)
 }
 
 export async function createScore(data: NewScoreEntry): Promise<ScoreEntry> {
@@ -113,17 +115,19 @@ export async function deleteScore(id: number): Promise<void> {
 
 //User
 export async function registerUser(data: RegisterRequest): Promise<User> {
-  return await apiFetch('/users/register', {
+  const result = await apiFetch('/users/register', {
     method: 'POST',
     body: JSON.stringify(data)
-  }) as User
+  })
+  return normalizeUser(result)
 }
 
 export async function loginUser(request: LoginRequest): Promise<User> {
-  return await apiFetch('/users/login', {
+  const result = await apiFetch('/users/login', {
     method: 'POST',
     body: JSON.stringify(request)
-  }) as User
+  })
+  return normalizeUser(result)
 }
 
 export async function logoutUser(): Promise<void> {
@@ -134,7 +138,8 @@ export const loginApi = loginUser
 export const registerApi = registerUser
 
 export async function getUserById(userId: number): Promise<User> {
-  return await apiFetch(`/users/${userId}`) as User
+  const data = await apiFetch(`/users/${userId}`)
+  return normalizeUser(data)
 }
 
 export async function requestPasswordReset(data: PasswordResetRequest): Promise<{ Message: string }> {
@@ -179,12 +184,14 @@ export async function deleteStudyRecord(id: number): Promise<void> {
 // ========== Badge ==========
 // Get all badge definitions.
 export async function getBadges(): Promise<Badge[]> {
-  return (await apiFetch('/badges')) ?? []
+  const data = (await apiFetch<unknown[]>('/badges')) ?? []
+  return data.map(normalizeBadge)
 }
 
 // Get badges unlocked by the current user.
 export async function getUserBadges(userId: number): Promise<UserBadge[]> {
-  return (await apiFetch(`/badges/user/${userId}`)) ?? []
+  const data = (await apiFetch<unknown[]>(`/badges/user/${userId}`)) ?? []
+  return data.map(normalizeUserBadge)
 }
 
 // Alias matching the Badges page import names.

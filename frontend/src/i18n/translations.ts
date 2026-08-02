@@ -235,6 +235,7 @@ const en = {
   'profile.noStudyYet': 'No study records yet',
   'profile.selectAvatar': 'Select Avatar Image',
   'profile.avatarAlt': 'Avatar',
+  'profile.viewFull': 'View Full Profile',
 
   // About
   'about.title': 'About StudyTracker',
@@ -493,6 +494,7 @@ const zh: Record<TranslationKey, string> = {
   'profile.noStudyYet': '暂无学习记录',
   'profile.selectAvatar': '选择头像图片',
   'profile.avatarAlt': '头像',
+  'profile.viewFull': '查看完整资料',
 
   'about.title': '关于 StudyTracker',
   'about.subtitle': '了解我们的学习平台',
