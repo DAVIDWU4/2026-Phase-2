@@ -28,12 +28,22 @@ vi.mock('../stores/authStore', async () => {
 
 describe('Login page', () => {
   const authenticate = vi.fn();
+  const mockAuthState = {
+    user: null,
+    loading: false,
+    login: vi.fn(),
+    authenticate,
+    register: vi.fn(),
+    refreshUser: vi.fn(),
+    logout: vi.fn(),
+    restoreSession: vi.fn(),
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
     useLocaleStore.setState({ locale: 'en' });
     vi.mocked(useAuthStore).mockImplementation((selector) =>
-      selector({ authenticate, user: null, loading: false } as ReturnType<typeof useAuthStore.getState>)
+      selector(mockAuthState)
     );
   });
 
