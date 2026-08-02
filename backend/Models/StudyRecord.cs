@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -13,6 +14,7 @@ public class StudyRecord
     [Column("user_id")]
     public int UserId { get; set; }
 
+    [JsonIgnore]
     public User User { get; set; } = null!;
 
     [Column("study_date")]

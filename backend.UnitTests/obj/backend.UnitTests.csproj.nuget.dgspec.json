@@ -10,7 +10,7 @@
         "projectUniqueName": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
         "projectName": "backend.UnitTests",
         "projectPath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
-        "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget",
         "outputPath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
@@ -378,7 +378,7 @@
         "projectUniqueName": "C:\\Users\\david\\2026-Phase-2\\backend\\backend.csproj",
         "projectName": "backend",
         "projectPath": "C:\\Users\\david\\2026-Phase-2\\backend\\backend.csproj",
-        "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget",
         "outputPath": "C:\\Users\\david\\2026-Phase-2\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [

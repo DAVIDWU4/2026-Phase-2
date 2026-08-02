@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -17,6 +18,7 @@ public class User
 
     [Required]
     [Column("password_hash")]
+    [JsonIgnore]
     public string PasswordHash { get; set; } = string.Empty;
 
     [MaxLength(50)]
@@ -47,7 +49,10 @@ public class User
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    [JsonIgnore]
     public ICollection<UserBadge> UserBadges { get; set; } = new List<UserBadge>();
+    [JsonIgnore]
     public ICollection<StudyRecord> StudyRecords { get; set; } = new List<StudyRecord>();
+    [JsonIgnore]
     public ICollection<ScoreEntry> Scores { get; set; } = new List<ScoreEntry>();
 }

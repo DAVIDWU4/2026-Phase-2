@@ -5,7 +5,7 @@ import ThemeToggle from '../components/ThemeToggle';
 
 const navItems = [
   { path: '/', label: '🏆 Leaderboard', icon: '🏆' },
-  { path: '/study', label: '📚 Study', icon: '📚' },
+  { path: '/study', label: '📚 学习打卡', icon: '📚' },
   { path: '/badges', label: '🏅 Badges', icon: '🏅' },
   { path: '/profile', label: '👤 Profile', icon: '👤' },
   { path: '/about', label: 'ℹ️ About', icon: 'ℹ️' },
@@ -58,7 +58,7 @@ export default function MainLayout() {
                     </span>
                   </div>
                   <button
-                    onClick={logout}
+                    onClick={() => void logout()}
                     className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 transition-colors"
                   >
                     Logout
@@ -103,7 +103,7 @@ export default function MainLayout() {
               {user && (
                 <button
                   onClick={() => {
-                    logout();
+                    void logout();
                     setMobileMenuOpen(false);
                   }}
                   className="w-full px-4 py-3 text-left font-medium text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg"

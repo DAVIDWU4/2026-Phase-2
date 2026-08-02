@@ -16,13 +16,10 @@ C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\backend.UnitTest
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\BCrypt-Net-Next.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll
-C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.Data.Sqlite.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Abstractions.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.InMemory.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Relational.dll
-C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Sqlite.dll
-C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.Extensions.DependencyModel.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.OpenApi.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.TestPlatform.CoreUtilities.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.TestPlatform.PlatformAbstractions.dll
@@ -33,9 +30,6 @@ C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.TestPl
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Microsoft.VisualStudio.TestPlatform.Common.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Newtonsoft.Json.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Scalar.AspNetCore.dll
-C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\SQLitePCLRaw.batteries_v2.dll
-C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\SQLitePCLRaw.core.dll
-C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\SQLitePCLRaw.provider.e_sqlite3.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\xunit.assert.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\xunit.core.dll
 C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\xunit.execution.dotnet.dll
@@ -147,3 +141,7 @@ C:\Users\david\2026-Phase-2\backend.UnitTests\obj\Debug\net10.0\refint\backend.U
 C:\Users\david\2026-Phase-2\backend.UnitTests\obj\Debug\net10.0\backend.UnitTests.pdb
 C:\Users\david\2026-Phase-2\backend.UnitTests\obj\Debug\net10.0\backend.UnitTests.genruntimeconfig.cache
 C:\Users\david\2026-Phase-2\backend.UnitTests\obj\Debug\net10.0\ref\backend.UnitTests.dll
+C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Npgsql.dll
+C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\SendGrid.dll
+C:\Users\david\2026-Phase-2\backend.UnitTests\bin\Debug\net10.0\StarkbankEcdsa.dll

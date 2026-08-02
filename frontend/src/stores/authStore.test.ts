@@ -5,6 +5,9 @@ import { loginUser } from '../api';
 
 vi.mock('../api', () => ({
   loginUser: vi.fn(),
+  logoutUser: vi.fn().mockResolvedValue(undefined),
+  getUserById: vi.fn(),
+  registerUser: vi.fn(),
 }));
 
 describe('authStore', () => {
@@ -37,7 +40,7 @@ describe('authStore', () => {
     expect(localStorage.getItem('user')).toContain('"Username":"test"');
   });
 
-  it('logout clears user and localStorage', () => {
+  it('logout clears user and localStorage', async () => {
     useAuthStore.setState({ user: {
       Id: 1,
       Username: 'test',
@@ -52,7 +55,7 @@ describe('authStore', () => {
     }, loading: false });
 
     localStorage.setItem('user', JSON.stringify(useAuthStore.getState().user));
-    useAuthStore.getState().logout();
+    await useAuthStore.getState().logout();
 
     expect(useAuthStore.getState().user).toBeNull();
     expect(localStorage.getItem('user')).toBeNull();

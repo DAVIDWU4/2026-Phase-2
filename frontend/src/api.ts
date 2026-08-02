@@ -125,6 +125,10 @@ export async function loginUser(request: LoginRequest): Promise<User> {
     body: JSON.stringify(request)
   }) as User
 }
+
+export async function logoutUser(): Promise<void> {
+  await apiFetch('/users/logout', { method: 'POST' })
+}
 // Alias to keep naming consistent with page components.
 export const loginApi = loginUser
 export const registerApi = registerUser

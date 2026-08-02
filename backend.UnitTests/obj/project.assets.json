@@ -2042,7 +2042,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\david\\.nuget\\packages\\": {},
+    "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
@@ -2051,7 +2051,7 @@
       "projectUniqueName": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
       "projectName": "backend.UnitTests",
       "projectPath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\backend.UnitTests.csproj",
-      "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\david\\AppData\\Local\\Temp\\cursor-sandbox-cache\\ea484684c578a3ea619b085e7d55fa7b\\nuget",
       "outputPath": "C:\\Users\\david\\2026-Phase-2\\backend.UnitTests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [

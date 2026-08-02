@@ -23,7 +23,7 @@ export interface StudyRecord {
   StreakCount: number;
   Notes: string | null;
 }
-export type NewStudyRecord = Omit<StudyRecord, "Id">;
+export type NewStudyRecord = Omit<StudyRecord, 'Id' | 'EarnedScore' | 'StreakCount'>;
 
 // Badge
 export interface Badge {

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { User, LoginRequest, RegisterRequest } from '../types';
-import { loginUser, registerUser } from '../api';
+import { loginUser, registerUser, getUserById, logoutUser } from '../api';
 
 const toNumber = (value: unknown, fallback: number): number => {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -42,7 +42,8 @@ interface AuthState {
   login: (userData: User) => void;
   authenticate: (payload: LoginRequest) => Promise<void>;
   register: (payload: RegisterRequest) => Promise<void>;
-  logout: () => void;
+  refreshUser: () => Promise<void>;
+  logout: () => Promise<void>;
   restoreSession: () => void;
 }
 
@@ -85,7 +86,21 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user: normalized });
   },
 
-  logout: () => {
+  refreshUser: async () => {
+    const current = useAuthStore.getState().user;
+    if (!current?.Id) return;
+    const fresh = await getUserById(current.Id);
+    const normalized = normalizeUserData(fresh);
+    localStorage.setItem('user', JSON.stringify(normalized));
+    set({ user: normalized });
+  },
+
+  logout: async () => {
+    try {
+      await logoutUser();
+    } catch {
+      // Clear local session even if the server call fails
+    }
     localStorage.removeItem('user');
     set({ user: null });
   }

@@ -1,9 +1,19 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 /// <reference types="vitest" />
 import '@testing-library/jest-dom';
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { useAuthStore } from '../stores/authStore';
 import Badges from './Badges';
+
+vi.mock('../api', () => ({
+  getAllBadges: vi.fn().mockResolvedValue([
+    { Id: 1, Name: 'First Step', Description: 'Complete your first study session', RequiredScore: 0, Icon: '🌱' },
+    { Id: 2, Name: 'Rising Star', Description: 'Earn 100 total points', RequiredScore: 100, Icon: '⭐' },
+  ]),
+  getUserUnlockedBadges: vi.fn().mockResolvedValue([
+    { UserId: 1, BadgeId: 1, UnlockedAt: '2026-07-29T00:00:00.000Z' },
+  ]),
+}));
 
 const defaultUser = {
   Id: 1,
@@ -23,11 +33,13 @@ describe('Badges page', () => {
     useAuthStore.setState({ user: null, loading: false });
   });
 
-  it('renders unlocked badge count based on user score', () => {
+  it('renders unlocked badge count from API data', async () => {
     useAuthStore.setState({ user: defaultUser, loading: false });
 
     render(<Badges />);
 
-    expect(screen.getByText('6/8 unlocked')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('1/2 unlocked')).toBeInTheDocument();
+    });
   });
 });

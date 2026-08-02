@@ -1,10 +1,14 @@
 using backend.Data;
 using backend.Models;
 using backend.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Dtos;
 using BCrypt.Net;
+using System.Security.Claims;
 
 namespace backend.Controllers;
 
@@ -156,6 +160,22 @@ public class UsersController : ControllerBase
             LastStudyDate = newUser.LastStudyDate,
             CreatedAt = newUser.CreatedAt
         };
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
+            new(ClaimTypes.Name, newUser.Username)
+        };
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(identity),
+            new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+            });
+
         return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, output);
     }
 
@@ -181,17 +201,31 @@ public class UsersController : ControllerBase
             LastStudyDate = user.LastStudyDate,
             CreatedAt = user.CreatedAt
         };
-        var cookieOptions = new CookieOptions
+
+        var claims = new List<Claim>
         {
-        HttpOnly = true,
-        Secure = true,
-        SameSite = SameSiteMode.None,
-        Path = "/",
-        Expires = DateTime.UtcNow.AddDays(7)
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.Username)
         };
-        Response.Cookies.Append("UserId", user.Id.ToString(), cookieOptions);
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(identity),
+            new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+            });
 
         return Ok(output);
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return Ok(new { Message = "Logged out successfully." });
     }
 
     [HttpPost("password-reset-request")]

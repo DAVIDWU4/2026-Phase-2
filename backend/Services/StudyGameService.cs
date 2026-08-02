@@ -12,62 +12,37 @@ public class StudyGameService(AppDbContext dbContext)
     /// Process submitted study record:
     /// Save record, calculate score based on duration, add earned score to user, create score log, unlock eligible badges
     /// </summary>
-    /// <param name="record">User submitted study session</param>
-    /// <returns>Saved study record entity</returns>
-    /// <exception cref="KeyNotFoundException">User does not exist</exception>
     public async Task<StudyRecord> SubmitStudyRecordAsync(StudyRecord record)
     {
-        _db.StudyRecords.Add(record);
-
         var user = await _db.Users.FindAsync(record.UserId);
         if (user is null)
         {
             throw new KeyNotFoundException("The specified user cannot be found.");
         }
 
-        // Calculate score: 1 point per 10 minutes of study
         int earnedScore = record.DurationMinutes / 10;
         record.EarnedScore = earnedScore;
-
-        // Calculate streak
         record.StreakCount = await CalculateStreakAsync(user.Id, record.StudyDate);
 
         user.TotalScore += earnedScore;
         user.StreakDays = record.StreakCount;
+        user.LastStudyDate = record.StudyDate;
+        user.Level = Math.Max(1, user.TotalScore / 100 + 1);
 
-        var scoreEntry = new ScoreEntry
+        _db.StudyRecords.Add(record);
+
+        _db.Scores.Add(new ScoreEntry
         {
             UserId = user.Id,
             Amount = record.EarnedScore,
             CreatedAt = DateTime.UtcNow,
             Reason = "Completed study session"
-        };
-        _db.Scores.Add(scoreEntry);
+        });
 
-        var allBadges = await _db.Badges.ToListAsync();
-        foreach (var badge in allBadges)
-        {
-            if (user.TotalScore >= badge.RequiredScore)
-            {
-                bool alreadyUnlocked = await _db.UserBadges
-                    .AnyAsync(ub => ub.UserId == user.Id && ub.BadgeId == badge.Id);
-
-                if (!alreadyUnlocked)
-                {
-                    _db.UserBadges.Add(new UserBadge
-                    {
-                        UserId = user.Id,
-                        BadgeId = badge.Id,
-                        UnlockedAt = DateTime.UtcNow
-                    });
-                }
-            }
-        }
-
+        await UnlockEligibleBadgesAsync(user, record);
         await _db.SaveChangesAsync();
         return record;
     }
-
 
     public async Task<List<StudyRecord>> GetAllStudyRecordsAsync()
     {
@@ -79,15 +54,12 @@ public class StudyGameService(AppDbContext dbContext)
         return await _db.StudyRecords.FindAsync(id);
     }
 
-
     public async Task<List<StudyRecord>> GetStudyRecordsByUserIdAsync(int userId)
     {
         return await _db.StudyRecords
             .Where(r => r.UserId == userId)
-           .ToListAsync();
+            .ToListAsync();
     }
-
-
 
     public async Task<bool> UpdateStudyRecordAsync(int id, StudyRecord updatedRecord)
     {
@@ -98,6 +70,7 @@ public class StudyGameService(AppDbContext dbContext)
         entity.DurationMinutes = updatedRecord.DurationMinutes;
         entity.EarnedScore = updatedRecord.EarnedScore;
         entity.StudyDate = updatedRecord.StudyDate;
+        entity.Notes = updatedRecord.Notes;
 
         await _db.SaveChangesAsync();
         return true;
@@ -108,46 +81,121 @@ public class StudyGameService(AppDbContext dbContext)
         var entity = await _db.StudyRecords.FindAsync(id);
         if (entity is null) return false;
 
+        var user = await _db.Users.FindAsync(entity.UserId);
+        if (user is not null)
+        {
+            user.TotalScore = Math.Max(0, user.TotalScore - entity.EarnedScore);
+            user.Level = Math.Max(1, user.TotalScore / 100 + 1);
+        }
+
         _db.StudyRecords.Remove(entity);
         await _db.SaveChangesAsync();
         return true;
     }
 
+    private async Task UnlockEligibleBadgesAsync(User user, StudyRecord record)
+    {
+        var existingBadgeIds = await _db.UserBadges
+            .Where(ub => ub.UserId == user.Id)
+            .Select(ub => ub.BadgeId)
+            .ToHashSetAsync();
+
+        var priorMinutes = await _db.StudyRecords
+            .Where(r => r.UserId == user.Id)
+            .SumAsync(r => (int?)r.DurationMinutes) ?? 0;
+        var totalMinutes = priorMinutes + record.DurationMinutes;
+
+        var priorSubjects = await _db.StudyRecords
+            .Where(r => r.UserId == user.Id)
+            .Select(r => r.Subject)
+            .ToListAsync();
+        var distinctSubjectCount = priorSubjects
+            .Append(record.Subject)
+            .Distinct()
+            .Count();
+
+        var priorDays = await _db.StudyRecords
+            .Where(r => r.UserId == user.Id)
+            .Select(r => r.StudyDate.Date)
+            .ToListAsync();
+        var distinctStudyDays = priorDays
+            .Append(record.StudyDate.Date)
+            .Distinct()
+            .Count();
+
+        var allBadges = await _db.Badges.ToListAsync();
+        foreach (var badge in allBadges)
+        {
+            if (existingBadgeIds.Contains(badge.Id)) continue;
+
+            if (IsBadgeEligible(badge, user, totalMinutes, distinctSubjectCount, distinctStudyDays))
+            {
+                _db.UserBadges.Add(new UserBadge
+                {
+                    UserId = user.Id,
+                    BadgeId = badge.Id,
+                    UnlockedAt = DateTime.UtcNow
+                });
+            }
+        }
+    }
+
     /// <summary>
-    /// Calculate the current streak count for a user based on their study history
+    /// Badge eligibility rules aligned with seed data in AppDbContext.
+    /// Badges with RequiredScore &gt; 0 use score thresholds; others use Id-specific rules.
     /// </summary>
-    /// <param name="userId">The user ID</param>
-    /// <param name="currentDate">The date of the current study record</param>
-    /// <returns>The streak count</returns>
+    private static bool IsBadgeEligible(
+        Badge badge,
+        User user,
+        int totalStudyMinutes,
+        int distinctSubjectCount,
+        int distinctStudyDays)
+    {
+        if (badge.RequiredScore > 0)
+            return user.TotalScore >= badge.RequiredScore;
+
+        return badge.Id switch
+        {
+            1 => true,  // First Step — awarded on first completed session
+            6 => user.StreakDays >= 3,
+            7 => user.StreakDays >= 7,
+            8 => user.StreakDays >= 15,
+            9 => user.StreakDays >= 30,
+            10 => totalStudyMinutes >= 60,
+            11 => totalStudyMinutes >= 300,
+            12 => totalStudyMinutes >= 600,
+            13 => distinctSubjectCount >= 3,
+            14 => distinctSubjectCount >= 5,
+            15 => distinctStudyDays >= 100,
+            _ => false
+        };
+    }
+
     private async Task<int> CalculateStreakAsync(int userId, DateTime currentDate)
     {
         int streak = 1;
-        
-        // Get all study records for the user, ordered by date descending
+
         var records = await _db.StudyRecords
             .Where(r => r.UserId == userId && r.StudyDate < currentDate)
             .OrderByDescending(r => r.StudyDate)
             .ToListAsync();
 
         DateTime previousDate = currentDate.Date;
-        
+
         foreach (var record in records)
         {
             DateTime recordDate = record.StudyDate.Date;
             TimeSpan difference = previousDate - recordDate;
-            
-            // If the previous record is exactly one day before, continue the streak
+
             if (difference.Days == 1)
             {
                 streak++;
                 previousDate = recordDate;
             }
-            // If there's a gap larger than one day, break the streak
             else if (difference.Days > 1)
             {
                 break;
             }
-            // If same day, skip (don't increment streak)
         }
 
         return streak;

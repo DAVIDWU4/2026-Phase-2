@@ -37,14 +37,14 @@ public class CoreBusinessTests
         db.Users.Add(user);
         await db.SaveChangesAsync();
 
-        const int earnedPoints = 100;
+        const int durationMinutes = 60;
+        const int expectedPoints = durationMinutes / 10;
         var record = new StudyRecord
         {
             UserId = user.Id,
             Subject = ".NET Testing",
             StudyDate = DateTime.UtcNow,
-            DurationMinutes = 60,
-            EarnedScore = earnedPoints
+            DurationMinutes = durationMinutes
         };
 
         // Act: Call official implemented service method from your backend project
@@ -52,10 +52,12 @@ public class CoreBusinessTests
 
         // Assert
         var updatedUser = await db.Users.FindAsync(user.Id);
-        Assert.Equal(100, updatedUser!.TotalScore);
+        Assert.Equal(expectedPoints, updatedUser!.TotalScore);
+        Assert.Equal(expectedPoints, record.EarnedScore);
 
         var scoreEntries = await db.Scores.Where(s => s.UserId == user.Id).ToListAsync();
         Assert.Single(scoreEntries);
+        Assert.Equal(expectedPoints, scoreEntries[0].Amount);
     }
 
     [Fact]
@@ -70,36 +72,34 @@ public class CoreBusinessTests
             Username = "BadgeTester",
             Email = "badge@test.com",
             PasswordHash = "passhash",
-            TotalScore = 90
+            TotalScore = 96
         };
         db.Users.Add(user);
         await db.SaveChangesAsync();
 
-        // Act: Submit session to gain 10 points, reach 100 total
+        // Act: 40 minutes = 4 points, reaches 100 total and unlocks Rising Star
         var record = new StudyRecord
         {
             UserId = user.Id,
             Subject = "Badge Test",
             StudyDate = DateTime.UtcNow,
-            DurationMinutes = 40,
-            EarnedScore = 10
+            DurationMinutes = 40
         };
         await service.SubmitStudyRecordAsync(record);
 
-        // Submit a second identical session to trigger duplicate check logic
+        // Submit a second session to trigger duplicate check logic
         var secondRecord = new StudyRecord
         {
             UserId = user.Id,
             Subject = "Badge Test Again",
             StudyDate = DateTime.UtcNow,
-            DurationMinutes = 40,
-            EarnedScore = 10
+            DurationMinutes = 40
         };
         await service.SubmitStudyRecordAsync(secondRecord);
 
-        // Assert: User total score increased twice
+        // Assert: User total score increased twice (4 + 4)
         var targetUser = await db.Users.FindAsync(user.Id);
-        Assert.Equal(110, targetUser!.TotalScore);
+        Assert.Equal(104, targetUser!.TotalScore);
 
         // Assert: Only one "Rising Star" badge unlocked (duplicate blocked)
         var targetBadge = await db.Badges.FirstAsync(b => b.Name == "Rising Star");
@@ -261,8 +261,7 @@ public class CoreBusinessTests
             UserId = user.Id,
             Subject = "Initial Subject",
             StudyDate = DateTime.UtcNow,
-            DurationMinutes = 30,
-            EarnedScore = 50
+            DurationMinutes = 30
         };
 
         // Create via service business method
