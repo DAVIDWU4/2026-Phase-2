@@ -14,6 +14,18 @@ vi.mock('../api', () => ({
   getUserUnlockedBadges: vi.fn().mockResolvedValue([
     { UserId: 1, BadgeId: 1, UnlockedAt: '2026-07-29T00:00:00.000Z' },
   ]),
+  getUserById: vi.fn().mockResolvedValue({
+    Id: 1,
+    Username: 'test',
+    Nickname: 'Tester',
+    Email: 'test@example.com',
+    Role: 'user',
+    TotalScore: 120,
+    Level: 1,
+    StreakDays: 3,
+    LastStudyDate: null,
+    CreatedAt: '2026-07-29T00:00:00.000Z',
+  }),
 }));
 
 const defaultUser = {
