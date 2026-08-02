@@ -24,38 +24,40 @@ export default function Study() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
-    const dur = parseInt(duration, 10);
-    if (!selectedSubject || !dur) {
-      setMessage('Please select a subject and enter duration');
-      setMessageType('error');
-      return;
-    }
+  const dur = parseInt(duration, 10);
+  if (!selectedSubject || !dur) {
+    setMessage('Please select a subject and enter duration');
+    setMessageType('error');
+    return;
+  }
 
-    setIsLoading(true);
-    try {
-      await createStudyRecord({
-        UserId: userId,
-        StudyDate: new Date().toISOString(),
-        DurationMinutes: dur,
-        Subject: selectedSubject,
-        EarnedScore: 0,
-        StreakCount: 0,
-        Notes: notes || null
-      });
-      setMessage('✅ Study session logged successfully!');
-      setMessageType('success');
-      setDuration('');
-      setSelectedSubject('');
-      setNotes('');
+  setIsLoading(true);
+  try {
+    await createStudyRecord({
+      UserId: userId,
+      StudyDate: new Date().toISOString(),
+      DurationMinutes: dur,
+      Subject: selectedSubject,
+      EarnedScore: 0,
+      StreakCount: 0,
+      Notes: notes || null
+    });
+    setMessage('✅ Study session logged successfully!');
+    setMessageType('success');
+    setDuration('');
+    setSelectedSubject('');
+    setNotes('');
+    setTimeout(() => {
       void fetchRecords();
-    } catch (err) {
-      console.error('Failed to create record:', err);
-      setMessage('❌ Failed to log study session. Is backend running?');
-      setMessageType('error');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    }, 300);
+  } catch (err) {
+    console.error('Failed to create record:', err);
+    setMessage('❌ Failed to log study session. Is backend running?');
+    setMessageType('error');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const fetchRecords = async () => {
     if (!user || !userId) return;
