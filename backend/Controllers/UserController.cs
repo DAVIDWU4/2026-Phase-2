@@ -72,7 +72,18 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<UserOutputDto>> PostUser(User user)
     {
-        // Admin callers must pass a hashed password.
+        var name = user.Username?.Trim() ?? string.Empty;
+        var email = user.Email?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email))
+            return BadRequest("Username and email are required");
+
+        bool nameUsed = await _context.Users.AnyAsync(u => u.Username.ToLower() == name.ToLower());
+        bool emailUsed = await _context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower());
+        if (nameUsed) return BadRequest("Username already exists");
+        if (emailUsed) return BadRequest("Email already exists");
+
+        user.Username = name;
+        user.Email = email;
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
@@ -127,16 +138,18 @@ public class UsersController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {
-        bool nameUsed = await _context.Users.AnyAsync(u => u.Username == dto.Username);
-        bool emailUsed = await _context.Users.AnyAsync(u => u.Email == dto.Email);
+        var username = dto.Username.Trim();
+        var email = dto.Email.Trim();
+        bool nameUsed = await _context.Users.AnyAsync(u => u.Username.ToLower() == username.ToLower());
+        bool emailUsed = await _context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower());
         if (nameUsed) return BadRequest("Username already exists");
         if (emailUsed) return BadRequest("Email already exists");
 
         var newUser = new User
         {
-            Username = dto.Username,
+            Username = username,
             Nickname = dto.Nickname,
-            Email = dto.Email,
+            Email = email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             Role = "user",
             TotalScore = 0,

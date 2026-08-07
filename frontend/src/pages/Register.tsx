@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import ThemeToggle from '../components/ThemeToggle';
@@ -34,8 +34,12 @@ export default function Register() {
   });
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
   const [errorMsg, setErrorMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Sync lock so a second click in the same tick cannot start another request.
+  const submitLockRef = useRef(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isSubmitting) return;
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     if (name === 'Username' || name === 'Password' || name === 'Email') {
@@ -48,16 +52,23 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitLockRef.current || isSubmitting) return;
+
     setErrorMsg('');
     const errs = validate(form, t);
     setFieldErrors(errs);
     if (Object.keys(errs).length > 0) return;
+
+    submitLockRef.current = true;
+    setIsSubmitting(true);
     try {
       await register(form);
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setErrorMsg(message || t('register.errorDefault'));
+      submitLockRef.current = false;
+      setIsSubmitting(false);
     }
   };
 
@@ -86,6 +97,7 @@ export default function Register() {
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('register.username')}</label>
               <input name="Username" value={form.Username} onChange={handleChange}
+                disabled={isSubmitting}
                 className={`input-field ${fieldErrors.Username ? 'input-error' : ''}`}
                 placeholder={t('register.usernamePlaceholder')} />
               {fieldErrors.Username && <p className="mt-1 text-xs text-red-500 dark:text-red-400">{fieldErrors.Username}</p>}
@@ -94,6 +106,7 @@ export default function Register() {
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('register.password')}</label>
               <input type="password" name="Password" value={form.Password} onChange={handleChange}
+                disabled={isSubmitting}
                 className={`input-field ${fieldErrors.Password ? 'input-error' : ''}`}
                 placeholder={t('register.passwordPlaceholder')} />
               {fieldErrors.Password && <p className="mt-1 text-xs text-red-500 dark:text-red-400">{fieldErrors.Password}</p>}
@@ -101,12 +114,15 @@ export default function Register() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('register.nickname')}</label>
-              <input name="Nickname" value={form.Nickname} onChange={handleChange} className="input-field" placeholder={t('register.nicknamePlaceholder')} />
+              <input name="Nickname" value={form.Nickname} onChange={handleChange}
+                disabled={isSubmitting}
+                className="input-field" placeholder={t('register.nicknamePlaceholder')} />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('register.email')}</label>
               <input type="email" name="Email" value={form.Email} onChange={handleChange}
+                disabled={isSubmitting}
                 className={`input-field ${fieldErrors.Email ? 'input-error' : ''}`}
                 placeholder={t('register.emailPlaceholder')} />
               {fieldErrors.Email && <p className="mt-1 text-xs text-red-500 dark:text-red-400">{fieldErrors.Email}</p>}
@@ -121,7 +137,13 @@ export default function Register() {
               </div>
             )}
 
-            <button type="submit" className="w-full btn-primary text-base py-3 mt-2">{t('register.submit')}</button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full btn-primary text-base py-3 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? t('register.submitting') : t('register.submit')}
+            </button>
 
             <div className="flex items-center gap-2 pt-2">
               <div className="flex-1 h-px bg-gray-200 dark:bg-dark-600"></div>
@@ -129,7 +151,12 @@ export default function Register() {
               <div className="flex-1 h-px bg-gray-200 dark:bg-dark-600"></div>
             </div>
 
-            <button type="button" onClick={() => navigate('/login')} className="w-full btn-outline text-base py-3">
+            <button
+              type="button"
+              onClick={() => navigate('/login')}
+              disabled={isSubmitting}
+              className="w-full btn-outline text-base py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               {t('register.hasAccount')}
             </button>
           </form>

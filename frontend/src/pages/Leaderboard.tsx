@@ -167,6 +167,7 @@ export default function Leaderboard() {
                           </span>
                         )}
                       </button>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate">@{entry.Username}</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {t('common.level')} {entry.Level} · {t('leaderboard.streak', { days: entry.StreakDays })}
                       </p>

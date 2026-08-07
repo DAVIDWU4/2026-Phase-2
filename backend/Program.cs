@@ -207,6 +207,17 @@ if (autoMigrate.Equals("true", StringComparison.OrdinalIgnoreCase))
     {
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        // Remove duplicate usernames before unique index migration is applied.
+        try
+        {
+            await UserMaintenanceService.DeduplicateUsernamesAsync(dbContext);
+        }
+        catch (Exception dedupeEx)
+        {
+            Console.WriteLine($"[DB] Username dedupe skipped: {dedupeEx.Message}");
+        }
+
         Console.WriteLine("[DB] Applying migrations...");
         await dbContext.Database.MigrateAsync();
         Console.WriteLine("[DB] Database migrations applied successfully.");

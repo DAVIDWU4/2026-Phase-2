@@ -52,6 +52,10 @@ public class AppDbContext : DbContext
             .HasMaxLength(50);
 
         modelBuilder.Entity<User>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
             .Property(u => u.Email)
             .IsRequired()
             .HasMaxLength(100);
