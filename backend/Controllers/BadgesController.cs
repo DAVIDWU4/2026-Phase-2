@@ -35,16 +35,28 @@ public class BadgesController : ControllerBase
         return badge;
     }
 
+    /// <summary>
+    /// Returns unlocked badges for a user. Any authenticated user may read
+    /// another user's badges (leaderboard / profile modal). Reconcile runs
+    /// only when viewing your own badges so others cannot trigger writes.
+    /// </summary>
     [Authorize]
     [HttpGet("user/{userId}")]
     public async Task<ActionResult<IEnumerable<UserBadge>>> GetUserBadges(int userId)
     {
         var currentUserId = GetCurrentUserId();
-        if (currentUserId is null || currentUserId.Value != userId)
-            return Forbid();
+        if (currentUserId is null)
+            return Unauthorized();
 
-        await _studyGameService.ReconcileUserBadgesAsync(userId);
-        await _context.SaveChangesAsync();
+        if (!await _context.Users.AnyAsync(u => u.Id == userId))
+            return NotFound();
+
+        // Keep own badge state accurate; public profile views are read-only.
+        if (currentUserId.Value == userId)
+        {
+            await _studyGameService.ReconcileUserBadgesAsync(userId);
+            await _context.SaveChangesAsync();
+        }
 
         var userBadges = await _context.UserBadges
             .Where(ub => ub.UserId == userId)
