@@ -13,14 +13,10 @@ Environment.SetEnvironmentVariable("DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE", "
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Support Render's PORT environment variable (common on PaaS platforms)
-// If PORT is set but ASPNETCORE_URLS is not, auto-configure the URL
-var port = Environment.GetEnvironmentVariable("PORT");
-if (!string.IsNullOrEmpty(port) && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPNETCORE_URLS")))
-{
-    builder.WebHost.UseUrls($"http://+:{port}");
-    Console.WriteLine($"[Host] Listening on port {port} (from PORT env var)");
-}
+// Render injects PORT; always bind explicitly so the health check can reach the process.
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+Console.WriteLine($"[Host] Listening on http://0.0.0.0:{port}");
 
 // Configure forwarded headers for reverse proxy (Render, nginx, etc.)
 // Required so the app knows it's running behind HTTPS when proxied
@@ -96,7 +92,10 @@ builder.Services.AddScoped<StudyGameService>();
 // Postgres database context
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connStr, npgsql =>
-        npgsql.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null)));
+    {
+        npgsql.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
+        npgsql.CommandTimeout(30);
+    }));
 
 // Global cookie policy: compatible with Vercel <-> Render cross-domain
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -166,6 +165,10 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Lightweight endpoints so Render health checks / probes succeed quickly
+app.MapGet("/", () => Results.Ok(new { service = "StudyTracker API", status = "ok" }));
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+
 app.MapControllers();
 
 // API docs only visible in development, hidden in production
@@ -175,7 +178,11 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-// Auto-run database migrations on startup (controlled by env var, default: enabled)
+// Start Kestrel BEFORE migrations so Render can reach the port (avoids deploy "Timed out"
+// when Postgres is slow or migrations take longer than the health window).
+await app.StartAsync();
+Console.WriteLine("[Startup] HTTP server started.");
+
 var autoMigrate = app.Configuration["AutoMigrate"] ?? "true";
 if (autoMigrate.Equals("true", StringComparison.OrdinalIgnoreCase))
 {
@@ -183,7 +190,8 @@ if (autoMigrate.Equals("true", StringComparison.OrdinalIgnoreCase))
     {
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        dbContext.Database.Migrate();
+        Console.WriteLine("[DB] Applying migrations...");
+        await dbContext.Database.MigrateAsync();
         Console.WriteLine("[DB] Database migrations applied successfully.");
     }
     catch (Exception ex)
@@ -195,4 +203,4 @@ if (autoMigrate.Equals("true", StringComparison.OrdinalIgnoreCase))
 }
 
 Console.WriteLine("[Startup] Application ready.");
-app.Run();
+await app.WaitForShutdownAsync();

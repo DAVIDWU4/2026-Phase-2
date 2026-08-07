@@ -22,6 +22,7 @@ COPY --from=build /app/publish .
 
 # Disable appsettings file watchers — Render/Linux hits inotify instance limits otherwise
 ENV DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE=false
+ENV ASPNETCORE_URLS=http://0.0.0.0:8080
 
 EXPOSE 80 8080
 ENTRYPOINT ["dotnet", "backend.dll"]
