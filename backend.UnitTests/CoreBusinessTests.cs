@@ -40,7 +40,7 @@ public class CoreBusinessTests
         await db.SaveChangesAsync();
 
         const int durationMinutes = 60;
-        const int expectedPoints = durationMinutes / 10;
+        const int expectedPoints = 30;
         var record = new StudyRecord
         {
             UserId = user.Id,
@@ -62,6 +62,24 @@ public class CoreBusinessTests
         Assert.Equal(expectedPoints, scoreEntries[0].Amount);
     }
 
+    [Theory]
+    [InlineData(0, 0)]
+    [InlineData(1, 1)]
+    [InlineData(5, 1)]
+    [InlineData(9, 1)]
+    [InlineData(10, 5)]
+    [InlineData(19, 5)]
+    [InlineData(20, 10)]
+    [InlineData(29, 10)]
+    [InlineData(30, 15)]
+    [InlineData(59, 15)]
+    [InlineData(60, 30)]
+    [InlineData(120, 30)]
+    public void CalculateEarnedScore_UsesTimeTiers(int minutes, int expected)
+    {
+        Assert.Equal(expected, StudyGameService.CalculateEarnedScore(minutes));
+    }
+
     [Fact]
     public async Task UserReachesScoreTarget_UnlockNewBadge_NoDuplicateUnlock()
     {
@@ -79,7 +97,7 @@ public class CoreBusinessTests
         db.Users.Add(user);
         await db.SaveChangesAsync();
 
-        // Act: 40 minutes = 4 points, reaches 100 total and unlocks Rising Star
+        // Act: 40 minutes = 15 points, reaches 100+ and unlocks Rising Star
         var record = new StudyRecord
         {
             UserId = user.Id,
@@ -99,9 +117,9 @@ public class CoreBusinessTests
         };
         await service.SubmitStudyRecordAsync(secondRecord);
 
-        // Assert: User total score increased twice (4 + 4)
+        // Assert: User total score increased twice (15 + 15)
         var targetUser = await db.Users.FindAsync(user.Id);
-        Assert.Equal(104, targetUser!.TotalScore);
+        Assert.Equal(126, targetUser!.TotalScore);
 
         // Assert: Only one "Rising Star" badge unlocked (duplicate blocked)
         var targetBadge = await db.Badges.FirstAsync(b => b.Name == "Rising Star");

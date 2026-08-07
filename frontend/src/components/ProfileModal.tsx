@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllBadges, getUserById, getUserUnlockedBadges } from '../api';
 import type { Badge, User } from '../types';
+import { useAuthStore } from '../stores/authStore';
 import { useTranslation, getBadgeLabel } from '../i18n/useTranslation';
 import { useLocaleStore } from '../stores/localeStore';
 import { getAvatarGradient, getDisplayInitial, getDisplayName } from '../utils/normalize';
@@ -14,6 +15,8 @@ interface ProfileModalProps {
 export default function ProfileModal({ userId, onClose }: ProfileModalProps) {
   const { t } = useTranslation();
   const locale = useLocaleStore(s => s.locale);
+  const currentUserId = useAuthStore(s => s.user?.Id);
+  const isOwnProfile = currentUserId != null && userId === currentUserId;
   const [user, setUser] = useState<User | null>(null);
   const [badges, setBadges] = useState<Badge[]>([]);
   const [unlockedIds, setUnlockedIds] = useState<Set<number>>(new Set());
@@ -65,7 +68,9 @@ export default function ProfileModal({ userId, onClose }: ProfileModalProps) {
       >
         <div className="p-6">
           <div className="flex items-start justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t('profile.title')}</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              {isOwnProfile ? t('profile.title') : t('profile.otherTitle')}
+            </h2>
             <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">
               ×
             </button>
@@ -129,13 +134,15 @@ export default function ProfileModal({ userId, onClose }: ProfileModalProps) {
                 )}
               </div>
 
-              <Link
-                to="/profile"
-                onClick={onClose}
-                className="btn-primary w-full py-2.5 text-center block"
-              >
-                {t('profile.viewFull')}
-              </Link>
+              {isOwnProfile && (
+                <Link
+                  to="/profile"
+                  onClick={onClose}
+                  className="btn-primary w-full py-2.5 text-center block"
+                >
+                  {t('profile.viewFull')}
+                </Link>
+              )}
             </>
           ) : null}
         </div>

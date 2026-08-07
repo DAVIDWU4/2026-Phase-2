@@ -18,6 +18,20 @@ public class StudyGameService(AppDbContext dbContext)
         int QualifyingSessionCount);
 
     /// <summary>
+    /// Tiered study points:
+    /// started (1+ min) → 1, 10+ → 5, 20+ → 10, 30+ → 15, 60+ → 30.
+    /// </summary>
+    public static int CalculateEarnedScore(int durationMinutes)
+    {
+        if (durationMinutes >= 60) return 30;
+        if (durationMinutes >= 30) return 15;
+        if (durationMinutes >= 20) return 10;
+        if (durationMinutes >= 10) return 5;
+        if (durationMinutes >= 1) return 1;
+        return 0;
+    }
+
+    /// <summary>
     /// Process submitted study record: save, score, update user metrics, reconcile badges.
     /// </summary>
     public async Task<StudyRecord> SubmitStudyRecordAsync(StudyRecord record)
@@ -28,7 +42,9 @@ public class StudyGameService(AppDbContext dbContext)
             throw new KeyNotFoundException("The specified user cannot be found.");
         }
 
-        int earnedScore = record.DurationMinutes / 10;
+        int earnedScore = string.Equals(record.Notes, CheckinNote, StringComparison.Ordinal)
+            ? 0
+            : CalculateEarnedScore(record.DurationMinutes);
         record.EarnedScore = earnedScore;
         record.StreakCount = await CalculateStreakAsync(user.Id, record.StudyDate);
 
@@ -77,7 +93,7 @@ public class StudyGameService(AppDbContext dbContext)
         var user = await _db.Users.FindAsync(entity.UserId);
         if (user is not null)
         {
-            var newEarned = updatedRecord.DurationMinutes / 10;
+            var newEarned = CalculateEarnedScore(updatedRecord.DurationMinutes);
             user.TotalScore = Math.Max(0, user.TotalScore - entity.EarnedScore + newEarned);
             user.Level = Math.Max(1, user.TotalScore / 100 + 1);
             entity.EarnedScore = newEarned;

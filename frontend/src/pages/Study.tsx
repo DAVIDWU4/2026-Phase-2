@@ -3,9 +3,9 @@ import { createStudyRecord, getStudyRecords } from '../api';
 import type { StudyRecord } from '../types';
 import { useAuthStore } from '../stores/authStore';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import StudyQuiz from '../components/StudyQuiz';
 import { useTranslation, getSubjectLabel } from '../i18n/useTranslation';
 import { useLocaleStore } from '../stores/localeStore';
-import type { TranslationKey } from '../i18n/translations';
 
 const SUBJECTS = [
   { id: 'math', icon: '📐', color: 'bg-blue-500' },
@@ -16,7 +16,14 @@ const SUBJECTS = [
   { id: 'art', icon: '🎨', color: 'bg-cyan-500' },
 ];
 
-const SCORE_TIER_MINUTES = [10, 30, 60, 90, 120] as const;
+const SCORE_TIERS = [
+  { min: 1, pts: 1 },
+  { min: 10, pts: 5 },
+  { min: 20, pts: 10 },
+  { min: 30, pts: 15 },
+  { min: 60, pts: 30 },
+] as const;
+
 const SESSION_STORAGE_KEY = 'study_active_session';
 const CHECKIN_NOTE = 'study-checkin';
 
@@ -37,7 +44,12 @@ function formatTimer(totalSeconds: number): string {
 }
 
 function calcEarnedPoints(minutes: number): number {
-  return Math.floor(minutes / 10);
+  if (minutes >= 60) return 30;
+  if (minutes >= 30) return 15;
+  if (minutes >= 20) return 10;
+  if (minutes >= 10) return 5;
+  if (minutes >= 1) return 1;
+  return 0;
 }
 
 function getYesterdayLastSession(records: StudyRecord[]): StudyRecord | null {
@@ -168,8 +180,9 @@ export default function Study() {
 
   const elapsedMinutes = Math.floor(elapsedSeconds / 60);
   const currentPoints = calcEarnedPoints(elapsedMinutes);
-  const nextTierMin = SCORE_TIER_MINUTES.find(m => elapsedMinutes < m);
-  const nextTierPts = nextTierMin ? calcEarnedPoints(nextTierMin) : 0;
+  const nextTier = SCORE_TIERS.find(tier => elapsedMinutes < tier.min);
+  const nextTierMin = nextTier?.min;
+  const nextTierPts = nextTier?.pts ?? 0;
 
   const yesterdaySession = getYesterdayLastSession(records);
   const continueSession = yesterdaySession ?? getLastSession(records);
@@ -261,29 +274,90 @@ export default function Study() {
     }
   };
 
-  return (
-    <div className="animate-fade-in space-y-5 pb-8">
-      {checkInModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          onClick={() => setCheckInModal(null)}>
-          <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-xl max-w-sm w-full p-6 text-center animate-fade-in"
-            onClick={e => e.stopPropagation()} role="dialog" aria-modal="true">
-            <div className="text-5xl mb-4">{checkInModal.isFirstToday ? '🎉' : '✅'}</div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-              {checkInModal.isFirstToday ? t('study.checkIn.titleFirst') : t('study.checkIn.titleAgain')}
-            </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-1">
-              {checkInModal.isFirstToday ? t('study.checkIn.descFirst') : t('study.checkIn.descAgain')}
-            </p>
-            <p className="text-sm text-primary-600 dark:text-primary-400 font-medium mb-6">
-              {t('study.checkIn.subject', { name: checkInModal.subjectName })}
-            </p>
-            <button type="button" onClick={() => setCheckInModal(null)} className="btn-primary w-full py-3">
-              {t('study.checkIn.confirm')}
-            </button>
+  const checkInOverlay = checkInModal && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={() => setCheckInModal(null)}>
+      <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-xl max-w-sm w-full p-6 text-center animate-fade-in"
+        onClick={e => e.stopPropagation()} role="dialog" aria-modal="true">
+        <div className="text-5xl mb-4">{checkInModal.isFirstToday ? '🎉' : '✅'}</div>
+        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          {checkInModal.isFirstToday ? t('study.checkIn.titleFirst') : t('study.checkIn.titleAgain')}
+        </h3>
+        <p className="text-gray-500 dark:text-gray-400 mb-1">
+          {checkInModal.isFirstToday ? t('study.checkIn.descFirst') : t('study.checkIn.descAgain')}
+        </p>
+        <p className="text-sm text-primary-600 dark:text-primary-400 font-medium mb-6">
+          {t('study.checkIn.subject', { name: checkInModal.subjectName })}
+        </p>
+        <button type="button" onClick={() => setCheckInModal(null)} className="btn-primary w-full py-3">
+          {t('study.checkIn.confirm')}
+        </button>
+      </div>
+    </div>
+  );
+
+  // Focused practice session: quiz only + compact timer / back controls
+  if (isStudying) {
+    const subject = subjectLabel(selectedSubject);
+    return (
+      <div className="animate-fade-in min-h-[70vh] flex flex-col pb-8">
+        {checkInOverlay}
+
+        <div className="flex items-center justify-between gap-3 mb-5">
+          <button
+            type="button"
+            onClick={cancelStudy}
+            disabled={isSubmitting}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium
+              text-gray-700 dark:text-gray-200 bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600
+              hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors disabled:opacity-50"
+          >
+            <span aria-hidden>←</span>
+            {t('study.backToSubjects')}
+          </button>
+
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700">
+            <span className="text-sm" aria-hidden>{subject.icon}</span>
+            <span className="font-mono text-lg font-bold text-primary-600 dark:text-primary-400 tracking-wide tabular-nums">
+              {formatTimer(elapsedSeconds)}
+            </span>
+            <span className="text-xs text-green-600 dark:text-green-400 font-medium hidden sm:inline">
+              +{currentPoints}
+            </span>
           </div>
         </div>
-      )}
+
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          {t('study.sessionSubject', { subject: subject.name })}
+          {nextTierMin && (
+            <span className="ml-1">{t('study.nextTier', { mins: nextTierMin - elapsedMinutes, pts: nextTierPts })}</span>
+          )}
+        </p>
+
+        <div className="card flex-1">
+          <StudyQuiz key={selectedSubject} subjectId={selectedSubject} focus />
+        </div>
+
+        <div className="mt-5 space-y-2">
+          <button
+            type="button"
+            onClick={() => void finishStudy()}
+            disabled={isSubmitting || elapsedMinutes < 1}
+            className="btn-primary w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? t('study.saving') : `✅ ${t('study.finish')}`}
+          </button>
+          {elapsedMinutes < 1 && (
+            <p className="text-xs text-center text-gray-400">{t('study.minOneMinute')}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="animate-fade-in space-y-5 pb-8">
+      {checkInOverlay}
 
       <div className="flex items-center gap-3">
         <span className="text-3xl">📚</span>
@@ -314,7 +388,7 @@ export default function Study() {
           <p className="text-gray-400 text-sm">{t('common.loading')}</p>
         ) : continueSession ? (
           <button type="button" onClick={() => void startStudy(continueSession.Subject)}
-            disabled={isStudying || isSubmitting || isCheckingIn || !userId}
+            disabled={isSubmitting || isCheckingIn || !userId}
             className="w-full flex items-center gap-4 p-4 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-700 hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left">
             {(() => {
               const info = subjectLabel(continueSession.Subject);
@@ -342,77 +416,43 @@ export default function Study() {
 
       <div className="card">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
-          {isStudying ? t('study.studying') : t('study.pickSubject')}
+          {t('study.pickSubject')}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          {isStudying ? t('study.timerHint') : t('study.durationHint')}
+          {t('study.durationHint')}
         </p>
 
-        {isStudying ? (
-          <div className="space-y-5">
-            <div className="text-center py-6 rounded-xl bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/20 border border-primary-200 dark:border-primary-700">
-              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium mb-4 ${subjectLabel(selectedSubject).color} text-white`}>
-                <span>{subjectLabel(selectedSubject).icon}</span>
-                <span>{subjectLabel(selectedSubject).name}</span>
-              </div>
-              <div className="text-5xl font-mono font-bold text-primary-600 dark:text-primary-400 tracking-wider">{formatTimer(elapsedSeconds)}</div>
-              <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-                {t('study.currentPoints')} <span className="font-bold text-green-600 dark:text-green-400">{currentPoints} {t('common.points')}</span>
-                {nextTierMin && (
-                  <span>{t('study.nextTier', { mins: nextTierMin - elapsedMinutes, pts: nextTierPts })}</span>
-                )}
-              </p>
-            </div>
-            <div className="flex gap-1">
-              {SCORE_TIER_MINUTES.map(min => (
-                <div key={min} className="flex-1 text-center">
-                  <div className={`h-2 rounded-full mb-1 ${elapsedMinutes >= min ? 'bg-primary-500' : 'bg-gray-200 dark:bg-dark-600'}`} />
-                  <span className="text-xs text-gray-400">{t(`tier.${min}` as TranslationKey)}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-3">
-              <button type="button" onClick={() => void finishStudy()} disabled={isSubmitting || elapsedMinutes < 1}
-                className="btn-primary flex-1 py-3 disabled:opacity-50 disabled:cursor-not-allowed">
-                {isSubmitting ? t('study.saving') : `✅ ${t('study.finish')}`}
+        <div className="space-y-4">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            {SUBJECTS.map(subject => (
+              <button key={subject.id} type="button" onClick={() => setSelectedSubject(subject.id)}
+                className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all cursor-pointer ${
+                  selectedSubject === subject.id
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 shadow-md ring-2 ring-primary-300'
+                    : 'border-gray-200 dark:border-dark-600 hover:border-primary-300 hover:bg-gray-50 dark:hover:bg-dark-700'
+                }`}>
+                <span className="text-2xl">{subject.icon}</span>
+                <span className="text-xs text-gray-600 dark:text-gray-300">{subjectLabel(subject.id).name}</span>
               </button>
-              <button type="button" onClick={cancelStudy} disabled={isSubmitting} className="btn-secondary py-3">{t('common.cancel')}</button>
-            </div>
-            {elapsedMinutes < 1 && <p className="text-xs text-center text-gray-400">{t('study.minOneMinute')}</p>}
+            ))}
           </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-              {SUBJECTS.map(subject => (
-                <button key={subject.id} type="button" onClick={() => setSelectedSubject(subject.id)}
-                  className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all cursor-pointer ${
-                    selectedSubject === subject.id
-                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 shadow-md ring-2 ring-primary-300'
-                      : 'border-gray-200 dark:border-dark-600 hover:border-primary-300 hover:bg-gray-50 dark:hover:bg-dark-700'
-                  }`}>
-                  <span className="text-2xl">{subject.icon}</span>
-                  <span className="text-xs text-gray-600 dark:text-gray-300">{subjectLabel(subject.id).name}</span>
-                </button>
-              ))}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('study.notes')}</label>
-              <input type="text" placeholder={t('study.notesPlaceholder')} value={notes}
-                onChange={e => setNotes(e.target.value)} className="input-field w-full" />
-            </div>
-            <button type="button" onClick={() => void startStudy(selectedSubject)}
-              disabled={!selectedSubject || !userId || isCheckingIn}
-              className="btn-primary w-full py-3 text-base disabled:opacity-50 disabled:cursor-not-allowed">
-              {isCheckingIn ? t('study.checkingIn') : selectedSubject
-                ? t('study.startSubject', { subject: subjectLabel(selectedSubject).name })
-                : t('study.pickSubjectFirst')}
-            </button>
-            <div className="p-3 rounded-lg bg-gray-50 dark:bg-dark-700/50 text-xs text-gray-500 dark:text-gray-400">
-              <p className="font-medium text-gray-600 dark:text-gray-300 mb-1">{t('study.scoreRules')}</p>
-              <p>{t('study.scoreRulesDesc')}</p>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">{t('study.notes')}</label>
+            <input type="text" placeholder={t('study.notesPlaceholder')} value={notes}
+              onChange={e => setNotes(e.target.value)} className="input-field w-full" />
           </div>
-        )}
+          <button type="button" onClick={() => void startStudy(selectedSubject)}
+            disabled={!selectedSubject || !userId || isCheckingIn}
+            className="btn-primary w-full py-3 text-base disabled:opacity-50 disabled:cursor-not-allowed">
+            {isCheckingIn ? t('study.checkingIn') : selectedSubject
+              ? t('study.startSubject', { subject: subjectLabel(selectedSubject).name })
+              : t('study.pickSubjectFirst')}
+          </button>
+          <div className="p-3 rounded-lg bg-gray-50 dark:bg-dark-700/50 text-xs text-gray-500 dark:text-gray-400">
+            <p className="font-medium text-gray-600 dark:text-gray-300 mb-1">{t('study.scoreRules')}</p>
+            <p>{t('study.scoreRulesDesc')}</p>
+          </div>
+        </div>
       </div>
 
       <div className="card">
@@ -442,7 +482,7 @@ export default function Study() {
               })();
               return (
                 <button key={record.Id} type="button" onClick={() => void startStudy(record.Subject)}
-                  disabled={isStudying || isSubmitting || isCheckingIn}
+                  disabled={isSubmitting || isCheckingIn}
                   className="w-full p-4 bg-gray-50 dark:bg-dark-700/50 rounded-xl border border-gray-200 dark:border-dark-600 hover:border-primary-300 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-lg ${info.color} flex items-center justify-center text-white shrink-0`}>{info.icon}</div>
@@ -464,7 +504,7 @@ export default function Study() {
                         <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 truncate">{record.Notes}</p>
                       )}
                     </div>
-                    {!isStudying && <span className="shrink-0 text-xs text-primary-500 dark:text-primary-400">{t('study.studyAgain')}</span>}
+                    <span className="shrink-0 text-xs text-primary-500 dark:text-primary-400">{t('study.studyAgain')}</span>
                   </div>
                 </button>
               );

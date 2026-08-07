@@ -63,11 +63,20 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Cookie.Name = "StudyApp.Auth";
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.None;
         options.Cookie.Path = "/";
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
         options.SlidingExpiration = true;
+        // Local HTTP preview cannot use Secure+SameSite=None cookies.
+        if (builder.Environment.IsDevelopment())
+        {
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        }
+        else
+        {
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SameSite = SameSiteMode.None;
+        }
         options.Events.OnRedirectToLogin = context =>
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
@@ -100,8 +109,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Global cookie policy: compatible with Vercel <-> Render cross-domain
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-    options.MinimumSameSitePolicy = SameSiteMode.None;
-    options.Secure = CookieSecurePolicy.Always;
+    if (builder.Environment.IsDevelopment())
+    {
+        options.MinimumSameSitePolicy = SameSiteMode.Lax;
+        options.Secure = CookieSecurePolicy.SameAsRequest;
+    }
+    else
+    {
+        options.MinimumSameSitePolicy = SameSiteMode.None;
+        options.Secure = CookieSecurePolicy.Always;
+    }
 });
 
 // CORS configuration: read Render env var AllowedOrigins, with AllowCredentials support
