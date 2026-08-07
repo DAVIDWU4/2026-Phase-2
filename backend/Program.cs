@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
+// Must be set before CreateBuilder: default JSON config uses FileSystemWatcher (inotify).
+// Render free instances often hit the 128 inotify limit and crash at startup.
+Environment.SetEnvironmentVariable("DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE", "false");
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Support Render's PORT environment variable (common on PaaS platforms)

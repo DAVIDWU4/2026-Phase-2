@@ -20,5 +20,8 @@ RUN apt-get update \
 WORKDIR /app
 COPY --from=build /app/publish .
 
+# Disable appsettings file watchers — Render/Linux hits inotify instance limits otherwise
+ENV DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE=false
+
 EXPOSE 80 8080
 ENTRYPOINT ["dotnet", "backend.dll"]
