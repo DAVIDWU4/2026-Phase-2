@@ -1,15 +1,32 @@
 # .NET
 backend/bin/
 backend/obj/
+backend.UnitTests/bin/
+backend.UnitTests/obj/
+backend/publish-test/
+*.user
+*.suo
 
 # Node
+node_modules/
 frontend/node_modules/
 frontend/dist/
+.npm-cache/
+*.tgz
+
+# IDE
+.vs/
+.vscode/
+.idea/
 
 # Environment
 .env
 .env.local
 .env.development.local
 .env.production.local
+
+# OS
+Thumbs.db
+.DS_Store
 
 DEPLOYMENT-GUIDE.md
