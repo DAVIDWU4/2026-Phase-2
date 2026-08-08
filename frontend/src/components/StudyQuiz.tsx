@@ -81,17 +81,24 @@ export default function StudyQuiz({ subjectId, focus = false }: StudyQuizProps) 
       <div className={`grid gap-2.5 ${focus ? 'sm:grid-cols-1' : ''}`}>
         {content.options.map((option, index) => {
           let style =
-            'border-gray-200 dark:border-dark-600 bg-white dark:bg-dark-800 hover:border-primary-300';
+            'border-gray-200 dark:border-dark-600 bg-gray-50 dark:bg-dark-700 text-gray-900 dark:text-gray-100 hover:border-primary-300';
+          let letterStyle = 'text-gray-500 dark:text-gray-400';
           if (revealed) {
             if (index === content.correct) {
               style = 'border-green-500 bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200';
+              letterStyle = 'text-green-600 dark:text-green-300';
             } else if (index === selected) {
               style = 'border-red-400 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-200';
+              letterStyle = 'text-red-500 dark:text-red-300';
             } else {
-              style = 'border-gray-200 dark:border-dark-600 bg-white/50 dark:bg-dark-800/50 opacity-60';
+              style =
+                'border-gray-200 dark:border-dark-600 bg-gray-50/70 dark:bg-dark-700/50 text-gray-600 dark:text-gray-300';
+              letterStyle = 'text-gray-400 dark:text-gray-500';
             }
           } else if (selected === index) {
-            style = 'border-primary-500 bg-primary-50 dark:bg-primary-900/40';
+            style =
+              'border-primary-500 bg-primary-50 dark:bg-primary-900/40 text-gray-900 dark:text-gray-100';
+            letterStyle = 'text-primary-600 dark:text-primary-300';
           }
 
           return (
@@ -104,7 +111,9 @@ export default function StudyQuiz({ subjectId, focus = false }: StudyQuizProps) 
                 focus ? 'text-base' : 'text-sm py-2.5 px-3 rounded-lg'
               } ${style}`}
             >
-              <span className="font-medium mr-2 text-gray-400">{String.fromCharCode(65 + index)}.</span>
+              <span className={`font-medium mr-2 ${letterStyle}`}>
+                {String.fromCharCode(65 + index)}.
+              </span>
               {option}
             </button>
           );

@@ -13,10 +13,19 @@ Environment.SetEnvironmentVariable("DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE", "
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Render injects PORT; always bind explicitly so the health check can reach the process.
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-Console.WriteLine($"[Host] Listening on http://0.0.0.0:{port}");
+// Render sets PORT — bind explicitly so health checks can reach the process.
+// Local Development uses launchSettings.json (http://localhost:5000) instead.
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+    Console.WriteLine($"[Host] Listening on http://0.0.0.0:{port}");
+}
+else if (!builder.Environment.IsDevelopment())
+{
+    builder.WebHost.UseUrls("http://0.0.0.0:8080");
+    Console.WriteLine("[Host] Listening on http://0.0.0.0:8080");
+}
 
 // Configure forwarded headers for reverse proxy (Render, nginx, etc.)
 // Required so the app knows it's running behind HTTPS when proxied
@@ -27,13 +36,27 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
-// Validate database connection string
+// Database provider: Sqlite for local Dev testing, Postgres for production (Render).
+var dbProvider = builder.Configuration["Database:Provider"]
+    ?? (builder.Environment.IsDevelopment() ? "Sqlite" : "Postgres");
 var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(connStr))
+var useSqlite = dbProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase);
+
+if (useSqlite)
 {
-    throw new InvalidOperationException(
-        "Database connection string 'DefaultConnection' is not configured. " +
-        "Set the ConnectionStrings__DefaultConnection environment variable.");
+    if (string.IsNullOrWhiteSpace(connStr))
+        connStr = "Data Source=app.db";
+    Console.WriteLine($"[DB] Provider=Sqlite ({connStr})");
+}
+else
+{
+    if (string.IsNullOrWhiteSpace(connStr))
+    {
+        throw new InvalidOperationException(
+            "Database connection string 'DefaultConnection' is not configured. " +
+            "Set the ConnectionStrings__DefaultConnection environment variable.");
+    }
+    Console.WriteLine("[DB] Provider=Postgres");
 }
 
 // Custom model validation 400 error response format
@@ -98,13 +121,27 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<PasswordResetService>();
 builder.Services.AddScoped<StudyGameService>();
 
-// Postgres database context
+// Database context — Sqlite (Debug/local) or Postgres (Release/production)
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connStr, npgsql =>
+{
+    if (useSqlite)
     {
-        npgsql.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
-        npgsql.CommandTimeout(30);
-    }));
+#if DEBUG
+        options.UseSqlite(connStr);
+#else
+        throw new InvalidOperationException(
+            "Sqlite is only available in Debug builds. Use Database:Provider=Postgres for Release.");
+#endif
+    }
+    else
+    {
+        options.UseNpgsql(connStr, npgsql =>
+        {
+            npgsql.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
+            npgsql.CommandTimeout(30);
+        });
+    }
+});
 
 // Global cookie policy: compatible with Vercel <-> Render cross-domain
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -208,6 +245,14 @@ if (autoMigrate.Equals("true", StringComparison.OrdinalIgnoreCase))
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+        if (useSqlite)
+        {
+            // Local Sqlite uses EnsureCreated — Postgres migrations are not portable to Sqlite.
+            Console.WriteLine("[DB] Ensuring Sqlite schema...");
+            await dbContext.Database.EnsureCreatedAsync();
+            Console.WriteLine("[DB] Sqlite schema ready.");
+        }
+
         // Remove duplicate usernames before unique index migration is applied.
         try
         {
@@ -218,9 +263,12 @@ if (autoMigrate.Equals("true", StringComparison.OrdinalIgnoreCase))
             Console.WriteLine($"[DB] Username dedupe skipped: {dedupeEx.Message}");
         }
 
-        Console.WriteLine("[DB] Applying migrations...");
-        await dbContext.Database.MigrateAsync();
-        Console.WriteLine("[DB] Database migrations applied successfully.");
+        if (!useSqlite)
+        {
+            Console.WriteLine("[DB] Applying migrations...");
+            await dbContext.Database.MigrateAsync();
+            Console.WriteLine("[DB] Database migrations applied successfully.");
+        }
     }
     catch (Exception ex)
     {

@@ -351,6 +351,8 @@ export default function Study() {
             <p className="text-xs text-center text-gray-400">{t('study.minOneMinute')}</p>
           )}
         </div>
+
+        <LanguageSwitcher />
       </div>
     );
   }

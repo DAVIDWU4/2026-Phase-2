@@ -16,7 +16,8 @@ public class User
     [Column("username")]
     public string Username { get; set; } = string.Empty;
 
-    [Required]
+    // Not [Required]: Required + JsonIgnore breaks OpenAPI schema generation (Scalar blank page).
+    // DB / registration still enforce a password hash.
     [Column("password_hash")]
     [JsonIgnore]
     public string PasswordHash { get; set; } = string.Empty;
